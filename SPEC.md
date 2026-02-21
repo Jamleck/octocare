@@ -13,7 +13,7 @@ Octocare is a SaaS multi-tenant platform for NDIS (National Disability Insurance
 | Org Admin | Manages users, org settings, onboarding | Yes |
 | Support Coordinator | Manages referrals, service connections, monitors delivery | Post-MVP |
 | Service Provider | Submits invoices, manages service bookings | Post-MVP (portal) |
-| Participant | Views budget and service history | Out of scope |
+| Participant / Nominee | Views budget summary and service history (read-only) | Phase 2 |
 
 **Team:** Solo developer (with AI assistance) initially, with plans to hire as product is validated.
 
@@ -167,9 +167,16 @@ Given solo developer, PostgreSQL choice, and the need to keep ops simple:
 
 **Provider** — A service provider (shared across tenants)
 - ABN, name, contact details
+- ABN verified against Australian Business Register (ABR) lookup
 - Registration groups, service types
 - GST registration status
 - Per-tenant relationship status
+
+**Participant Goal** (post-MVP) — Goals tracked within a participant's plan
+- Goal description, category (e.g., independence, social participation, employment)
+- Status: `active`, `achieved`, `discontinued`
+- Auto-updated after plan reviews when new plan data is available
+- Linked to relevant budget categories and service agreements
 
 ### 3.2 Plan Transfer (Recommended Approach)
 
@@ -274,29 +281,45 @@ When a PM flags an issue with an invoice:
 5. PM resolves: approve (possibly with adjustments), reject, or escalate
 6. Full dispute thread is preserved in the event stream
 
+### 5.4 Provider Payment Processing
+
+After claims are accepted by the NDIA and funds received:
+
+- **ABA file generation:** System generates ABA (Australian Bankers' Association) formatted files for bulk provider payments. ABA is the standard format accepted by all Australian banks for batch payments.
+- **Payment batch workflow:** Finance staff selects approved invoices ready for payment → reviews payment batch → generates ABA file → uploads to banking portal → marks batch as paid in system.
+- **Provider remittance advices:** Auto-generated remittance advice (PDF or email) sent to each provider detailing which invoices are included in the payment, with RCTI (Recipient Created Tax Invoice) information where applicable.
+- **Payment reconciliation:** Match bank statement entries against payment batches. Flag discrepancies for review.
+- **Payment events:** All payment actions recorded in the event stream: `PaymentBatchCreated`, `AbaFileGenerated`, `PaymentSent`, `PaymentConfirmed`, `RemittanceAdviceSent`.
+
 ---
 
-## 6. Claim Submission (Phased NDIA Integration)
+## 6. Claim Submission & NDIA Integration
 
-### Phase 1 — CSV Export (MVP)
+The NDIA is transitioning from its legacy myplace portal to the new **PACE** (Provider and Consumer Experience) system. Octocare must support both during the transition period and ultimately target PACE as the primary integration point.
+
+### Phase 1 — CSV Export + Read-Only API (MVP)
 
 - PM selects approved invoices to include in a claim batch
 - System generates NDIA-formatted bulk payment request CSV
-- PM downloads and manually uploads to myplace portal
+- PM downloads and manually uploads to myplace/PACE portal
 - PM manually records claim outcome (accepted/rejected per line) back in the system
 - System reconciles: marks invoices as paid or flags rejections
+- **PRODA/PACE read-only integration:** Sync participant plan data, verify budget allocations, and receive live plan-change notifications from the NDIA. This reduces manual data entry and catches plan changes early.
 
-### Phase 2 — B2G API Integration
+### Phase 2 — Real-Time Claims via PRODA + PACE APIs
 
-- Use NDIA's official machine-to-machine APIs where available
-- Automate claim submission and status polling
+- Full real-time claims submission via NDIA machine-to-machine APIs (both legacy PRODA and new PACE endpoints)
+- Claims submitted and responses received in seconds (not days)
 - Auto-reconcile accepted claims, flag rejections for PM review
+- Automatic status polling for in-flight claims
+- Support for both the legacy myplace API and new PACE API during transition
 
-### Phase 3 — Browser Automation (if needed)
+### Phase 3 — Browser Automation (fallback only)
 
-- For workflows not covered by B2G APIs
+- Only for workflows not yet covered by PRODA/PACE APIs
 - Headless browser automation (Playwright) as last resort
 - Must be resilient to portal UI changes — circuit breaker pattern, alerts on failure
+- Phased out as PACE API coverage expands
 
 ---
 
@@ -328,6 +351,27 @@ Configurable alerts (email-first, with in-app notification centre):
 - Projected overspend before plan end
 - Plan expiry approaching (90 days, 60 days, 30 days)
 - No invoices received for a participant in X weeks (may indicate service gap)
+
+### 7.4 Plan Management Fee Automation
+
+Plan managers charge the NDIS for their plan management services using specific NDIS support items (e.g., "Plan Management — Plan Setup", "Plan Management — Monthly Fee"). The system automates this:
+
+- **Auto-calculate PM fees** per the NDIS price guide rates for plan management support items
+- **Monthly fee generation:** System auto-generates PM fee invoices at the start of each month for all active participants
+- **Setup fee tracking:** One-off plan setup fee generated when a new participant is onboarded
+- **Batch claiming:** PM fee claims are batched alongside regular provider invoice claims
+- **Revenue tracking:** Dashboard showing PM fee revenue per participant, per period, with projections
+- **Fee events:** `PmFeeGenerated`, `PmFeeClaimed`, `PmFeeReceived` recorded in event stream
+
+### 7.5 Participant Statements
+
+Automated monthly budget statements for participants and their nominees:
+
+- **Auto-generated monthly:** Statement includes budget allocation, spending by category, services received, remaining balance, and burn rate summary
+- **Delivery:** Emailed to participant and/or nominee as PDF attachment. Configurable per participant (email, opt-out).
+- **On-demand generation:** PM can generate a statement for any date range at any time
+- **Branding:** Statement template customisable per organisation (logo, contact details, footer text)
+- **Statement events:** `ParticipantStatementGenerated`, `ParticipantStatementSent` recorded in event stream
 
 ---
 
@@ -393,7 +437,9 @@ draft → sent → active → expiring → expired
 
 ---
 
-## 11. Notifications
+## 11. Notifications & Communication
+
+### 11.1 Alerts & Notifications
 
 **Email-first approach:**
 
@@ -403,9 +449,47 @@ draft → sent → active → expiring → expired
 - User preferences: per-notification-type control over immediate vs digest vs off
 - Org-level defaults that individual users can override
 
+### 11.2 Communication Tools
+
+Outbound communication with providers and participants, integrated into the workflow:
+
+- **Email templates:** Pre-built and customisable templates for common communications — invoice queries, dispute notifications, service agreement renewals, plan transition notices, welcome packs
+- **Template variables:** Auto-populated from participant/provider/invoice data (e.g., `{{participant.name}}`, `{{invoice.total}}`)
+- **SMS integration (Phase 2):** For time-sensitive notifications — claim outcomes, payment confirmations, urgent plan change alerts. Opt-in per recipient.
+- **Communication log:** All outbound emails and SMS linked to the relevant participant/provider record. Searchable, filterable, and included in audit trail.
+- **Bulk communications:** Send templated communications to multiple participants or providers (e.g., price guide change notification, holiday closure notice)
+
 ---
 
-## 12. Money Handling
+## 12. Accounting Integration
+
+Integration with Australian accounting platforms for seamless financial workflows:
+
+### 12.1 Supported Platforms
+
+- **Xero** (priority — dominant in AU small/mid business) — Phase 2
+- **MYOB** (strong in AU mid-market) — Phase 2
+- QuickBooks Online — Phase 3 (if demand warrants)
+
+### 12.2 Integration Scope
+
+- **Invoice sync:** Approved provider invoices pushed to accounting system as bills/payables
+- **Payment sync:** Provider payments recorded in Octocare reflected in accounting system
+- **NDIA receipts:** Claim payments received from NDIA recorded as income
+- **PM fee revenue:** Plan management fee invoices synced as revenue entries
+- **Chart of accounts mapping:** Configurable mapping between Octocare budget categories and accounting chart of accounts. Default mapping provided, customisable per org.
+- **Reconciliation:** Two-way sync status dashboard showing matched/unmatched transactions between Octocare and the accounting system
+
+### 12.3 Technical Approach
+
+- OAuth 2.0 connection flow for each accounting platform
+- Background sync worker with configurable frequency (real-time push for critical items, hourly batch for others)
+- Conflict resolution: Octocare is source of truth for NDIS data; accounting system is source of truth for non-NDIS financials
+- Disconnect handling: graceful degradation if accounting API is unavailable, with queued retry
+
+---
+
+## 13. Money Handling
 
 **Recommendation: Integer cents (long) for all monetary values.**
 
@@ -420,9 +504,9 @@ draft → sent → active → expiring → expired
 
 ---
 
-## 13. Privacy & Security
+## 14. Privacy & Security
 
-### 13.1 Pragmatic Baseline (MVP)
+### 14.1 Pragmatic Baseline (MVP)
 
 - **Encryption in transit:** TLS 1.2+ everywhere
 - **Encryption at rest:** Azure-managed encryption for database and blob storage
@@ -434,7 +518,7 @@ draft → sent → active → expiring → expired
 - **Logging:** Structured audit logs for all data access and mutations (inherent in event sourcing)
 - **HTTPS only:** HSTS headers, secure cookies
 
-### 13.2 Compliance Roadmap (Post-MVP)
+### 14.2 Compliance Roadmap (Post-MVP)
 
 - Formal Privacy Impact Assessment
 - Data breach notification procedure (per Notifiable Data Breaches scheme)
@@ -445,7 +529,7 @@ draft → sent → active → expiring → expired
 
 ---
 
-## 14. MVP Scope & Phasing
+## 15. MVP Scope & Phasing
 
 ### MVP (Phase 1) — Plan Manager Core
 
@@ -459,7 +543,12 @@ draft → sent → active → expiring → expired
 - Invoice approval/rejection workflow
 - Invoice dispute workflow (PM-side only, provider notified via email)
 - Claim batch creation and CSV export (NDIA format)
+- PRODA/PACE read-only API integration (plan sync, budget verification, plan-change notifications)
 - Manual claim reconciliation (PM records outcome)
+- Provider payment processing — ABA file generation, payment batching, remittance advices
+- ABN verification against Australian Business Register (ABR) on provider creation
+- Plan management fee automation (monthly fee generation, setup fees, batch claiming)
+- Automated monthly participant budget statements (email as PDF)
 - Real-time budget tracking with projections and burn rate
 - Budget threshold alerts (email)
 - Plan expiry alerts and guided transition workflow
@@ -467,61 +556,78 @@ draft → sent → active → expiring → expired
 - CSV/Excel export for all reports
 - Price guide import tool (support for multiple versions)
 - Service agreement creation from templates, upload signed PDF, expiry tracking
+- Email communication templates with variable substitution
+- Responsive, mobile-friendly web design (no native app — mobile-optimised web UI)
 
 **Not in scope for MVP:**
 - Provider portal (providers interact via email/phone, PM enters invoices)
 - Email/OCR invoice ingestion
-- Participant-facing access
-- NDIA portal automation (B2G API or browser)
+- Full real-time NDIA claims submission (read-only API integration only in MVP)
 - E-signature integration
 - Support coordinator workflows
 - GST handling
+- Accounting software integration
+- SMS notifications
+- Native mobile apps
 
-### Phase 2 — Provider Portal & AI Ingestion
+### Phase 2 — NDIA Real-Time Claims, Provider Portal & AI Ingestion
 
+- **Real-time claims submission** via PRODA + PACE APIs (claims approved in seconds)
+- Accounting integration (Xero, MYOB) — invoice sync, payment reconciliation, chart of accounts mapping
 - Provider self-service portal (invoice submission, payment status tracking)
 - Email ingestion with AI extraction + human review
+- Read-only participant/family budget view (shareable link or login)
+- SMS integration for time-sensitive notifications
 - Cancellation fee guided validation
 - Service agreement delivery tracking
 - Enhanced reporting (provider spending, service agreement status)
+- Bulk communication tools (templated emails to multiple participants/providers)
 
-### Phase 3 — NDIA Integration & Scale
+### Phase 3 — Scale & Advanced Features
 
-- B2G API integration for claim submission and reconciliation
-- Browser automation for remaining portal workflows
+- Browser automation for portal workflows not covered by PACE APIs (fallback only)
 - Support coordinator persona and workflows
+- Participant goal tracking with plan review auto-updates
+- Incident and complaint management (NDIS Quality & Safeguards compliance)
 - Advanced budget projections (ML-based spending pattern analysis)
 - BI tool integration (read replica or API)
+- QuickBooks Online integration (if demand warrants)
 
 ### Phase 4 — Enterprise & Compliance
 
+- Native mobile apps (iOS, Android) for participants and plan managers
 - Database-per-tenant option for enterprise customers
 - SOC 2 compliance
-- Participant portal (read-only budget/service view)
+- Staff qualification and certification tracking (with expiry alerts)
 - White-label/custom branding per org
 - Full GST engine if market demands it
 
 ---
 
-## 15. Key Technical Risks
+## 16. Key Technical Risks
 
 | Risk | Impact | Mitigation |
 |---|---|---|
+| NDIA PACE migration timeline uncertainty | APIs may change mid-development, dual system support needed | Abstract NDIA integration behind an interface layer. Support both PRODA and PACE. Monitor NDIA transition announcements. |
 | NDIA changes portal/CSV format without notice | Claims fail to process | Version the CSV generator, monitor for format changes, alert on submission failures |
 | Price guide restructuring (not just rate changes) | Support items renumbered, categories changed | Price guide versioning handles this, but migration tooling needed for mapping old → new items |
 | Event store grows large over time | Slow projections, storage costs | Snapshot strategy for aggregates, archive old events to cold storage, partition events table by date |
 | Solo developer bottleneck | Slow iteration, single point of failure | Keep architecture simple, lean on managed services, automate everything, document thoroughly |
 | RLS misconfiguration leaks tenant data | Data breach, regulatory consequences | RLS as defence-in-depth (not sole mechanism), integration tests that verify isolation, regular security audits |
 | AI invoice extraction accuracy | PM spends more time correcting than entering manually | Always human-in-the-loop, track extraction accuracy metrics, fall back to manual if accuracy drops below threshold |
+| Accounting integration API instability | Sync failures, data mismatches | Queue-based sync with retry, reconciliation dashboard, graceful degradation when APIs unavailable |
 
 ---
 
-## 16. Open Questions
+## 17. Open Questions
 
 These need answers before or during development:
 
 1. **IdP choice:** Auth0 vs Azure AD B2C. Auth0 has better DX, Azure AD B2C is cheaper at scale and integrates with Azure ecosystem. Recommend Auth0 for MVP speed, evaluate migration later.
-2. **NDIA B2G API access:** Need to apply for API access through PRODA. Lead time and approval process unknown. Start CSV export and investigate in parallel.
+2. **NDIA PACE API access:** Need to apply for API access through PRODA. The NDIA is transitioning to PACE — determine current API availability, lead time for access, and which endpoints are live vs still in legacy myplace. Start CSV export and begin PRODA registration in parallel.
 3. **Price guide data source:** NDIA publishes the price guide as PDF and Excel. Need a reliable import pipeline. Consider scraping the NDIS website or using community-maintained machine-readable versions.
 4. **E-signature provider:** DocuSign is expensive. Alternatives: SignNow, HelloSign, or build a simple in-app signature capture for MVP.
 5. **Email ingestion infrastructure:** Need a dedicated email receiving service (e.g., SendGrid Inbound Parse, AWS SES) for the OCR pipeline. Architecture decision needed before Phase 2.
+6. **Accounting integration priority:** Xero vs MYOB first. Xero has better API and is more common among smaller plan management orgs. MYOB is stronger in mid-market. Recommend Xero first based on target market.
+7. **SMS provider choice:** Twilio (global, mature API) vs MessageMedia (Australian, NDIS sector familiarity) vs AWS SNS (cheaper, less feature-rich). Decision needed before Phase 2 SMS feature.
+8. **PACE migration timeline:** NDIA's PACE rollout timeline affects when to prioritise full API integration vs CSV fallback. Monitor NDIA announcements and engage with their developer community.
