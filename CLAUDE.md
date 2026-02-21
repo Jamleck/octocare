@@ -13,12 +13,12 @@ See [SPEC.md](SPEC.md) for the full product specification including architecture
 ## Stack
 
 - **Backend:** ASP.NET Core (C#)
-- **Frontend:** Next.js + React, shadcn/ui + Tailwind CSS
+- **Frontend:** React (Vite SPA), shadcn/ui + Tailwind CSS
 - **Database:** PostgreSQL (event-sourced financial ledger, RLS for multi-tenancy)
 - **Auth:** External IdP (Auth0 or Azure AD B2C) + custom RBAC
 - **Hosting:** Azure (Australia East)
-- **Repo structure:** Monorepo — `src/api/` (ASP.NET Core), `src/web/` (Next.js)
+- **Repo structure:** Monorepo — `src/api/` (ASP.NET Core), `src/web/` (Vite + React)
 
 ## Status
 
-Greenfield project — spec complete, no application code yet.
+Monorepo scaffolded. Backend (ASP.NET Core clean architecture) and frontend (Vite + React) are buildable with passing tests.

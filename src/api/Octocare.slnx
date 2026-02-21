@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Octocare.Api/Octocare.Api.csproj" />
+  <Project Path="Octocare.Application/Octocare.Application.csproj" />
+  <Project Path="Octocare.Domain/Octocare.Domain.csproj" />
+  <Project Path="Octocare.Infrastructure/Octocare.Infrastructure.csproj" />
+  <Project Path="Octocare.Tests/Octocare.Tests.csproj" />
+</Solution>
