@@ -26,7 +26,7 @@ Octocare is a SaaS multi-tenant platform for NDIS (National Disability Insurance
 | Layer | Technology |
 |---|---|
 | Backend API | ASP.NET Core (C#) |
-| Frontend | React / Next.js |
+| Frontend | React (Vite SPA) |
 | UI Components | shadcn/ui + Tailwind CSS |
 | Database | PostgreSQL |
 | Event Store | PostgreSQL (JSONB event payloads) |
@@ -45,10 +45,10 @@ octocare/
 │   │   ├── Octocare.Application/ # Use cases, command/query handlers
 │   │   ├── Octocare.Infrastructure/ # EF Core, event store, external integrations
 │   │   └── Octocare.Tests/     # Unit + integration tests
-│   └── web/                    # Next.js frontend
-│       ├── app/                # Next.js app router
-│       ├── components/         # shadcn/ui + custom components
-│       ├── lib/                # API client, utilities
+│   └── web/                    # React (Vite SPA) frontend
+│       ├── src/                # App source (App.tsx, components, lib)
+│       │   ├── components/     # shadcn/ui + custom components
+│       │   └── lib/            # API client, utilities
 │       └── __tests__/          # Frontend tests
 ├── shared/                     # Shared types/contracts (OpenAPI generated)
 ├── tools/                      # Scripts, price guide importers, migrations
