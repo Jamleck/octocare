@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { validateNdisNumber, validateRequired, validateEmail, validateDateNotFuture } from '@/lib/validation';
 import { ApiError } from '@/lib/api-error';
+import { User, Heart, Loader2 } from 'lucide-react';
 
 export interface ParticipantFormData {
   ndisNumber: string;
@@ -41,6 +43,7 @@ const emptyForm: ParticipantFormData = {
 };
 
 export function ParticipantForm({ initialValues, onSubmit, isEdit }: ParticipantFormProps) {
+  const navigate = useNavigate();
   const [form, setForm] = useState<ParticipantFormData>({ ...emptyForm, ...initialValues });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({});
@@ -97,11 +100,17 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Participant Details</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <User className="h-4 w-4 text-muted-foreground" />
+            Participant Details
+          </CardTitle>
+          <CardDescription>
+            Core NDIS participant information. Fields marked with * are required.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="ndisNumber">NDIS Number</Label>
+            <Label htmlFor="ndisNumber">NDIS Number *</Label>
             <Input
               id="ndisNumber"
               value={form.ndisNumber}
@@ -109,13 +118,14 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
               placeholder="9 digits starting with 43"
               maxLength={9}
               disabled={isEdit}
+              className="max-w-xs font-mono"
             />
             {field('ndisNumber') && <p className="text-sm text-destructive">{field('ndisNumber')}</p>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName">First Name *</Label>
               <Input
                 id="firstName"
                 value={form.firstName}
@@ -125,7 +135,7 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
               {field('firstName') && <p className="text-sm text-destructive">{field('firstName')}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName">Last Name *</Label>
               <Input
                 id="lastName"
                 value={form.lastName}
@@ -137,13 +147,14 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dateOfBirth">Date of Birth</Label>
+            <Label htmlFor="dateOfBirth">Date of Birth *</Label>
             <Input
               id="dateOfBirth"
               type="date"
               value={form.dateOfBirth}
               onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
               required
+              className="max-w-xs"
             />
             {field('dateOfBirth') && <p className="text-sm text-destructive">{field('dateOfBirth')}</p>}
           </div>
@@ -182,7 +193,13 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
 
       <Card>
         <CardHeader>
-          <CardTitle>Nominee / Guardian</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Heart className="h-4 w-4 text-muted-foreground" />
+            Nominee / Guardian
+          </CardTitle>
+          <CardDescription>
+            Optional. Add details of the participant's nominee or guardian if applicable.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -227,9 +244,13 @@ export function ParticipantForm({ initialValues, onSubmit, isEdit }: Participant
         </CardContent>
       </Card>
 
-      <div className="flex gap-4">
+      <div className="flex gap-3">
         <Button type="submit" disabled={saving}>
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {saving ? 'Saving...' : isEdit ? 'Update Participant' : 'Create Participant'}
+        </Button>
+        <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+          Cancel
         </Button>
       </div>
     </form>

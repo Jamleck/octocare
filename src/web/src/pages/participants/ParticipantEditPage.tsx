@@ -1,7 +1,9 @@
-import { useParams, useNavigate } from 'react-router';
+import { Link, useParams, useNavigate } from 'react-router';
+import { Button } from '@/components/ui/button';
 import { ParticipantForm, type ParticipantFormData } from '@/components/participants/ParticipantForm';
 import { useParticipant, updateParticipant } from '@/hooks/useParticipants';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft } from 'lucide-react';
 
 export function ParticipantEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -11,8 +13,9 @@ export function ParticipantEditPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
+        <Skeleton className="h-5 w-32" />
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       </div>
     );
   }
@@ -39,7 +42,18 @@ export function ParticipantEditPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Edit Participant</h1>
+      <div>
+        <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
+          <Link to={`/participants/${participant.id}`}>
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            {participant.firstName} {participant.lastName}
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold tracking-tight">Edit Participant</h1>
+        <p className="text-sm text-muted-foreground">
+          Update details for {participant.firstName} {participant.lastName}.
+        </p>
+      </div>
       <ParticipantForm
         initialValues={{
           ndisNumber: participant.ndisNumber,

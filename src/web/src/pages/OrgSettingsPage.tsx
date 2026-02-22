@@ -7,6 +7,7 @@ import { useOrganisation } from '@/hooks/useOrganisation';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UpdateOrganisationRequest } from '@/types/api';
 import { ApiError } from '@/lib/api-error';
+import { Building2, Loader2, Check } from 'lucide-react';
 
 export function OrgSettingsPage() {
   const { organisation, isLoading, updateOrganisation } = useOrganisation();
@@ -55,24 +56,32 @@ export function OrgSettingsPage() {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full rounded-lg" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Organisation Settings</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Organisation Settings</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage your organisation's profile and contact information.
+        </p>
+      </div>
 
-      <Card>
+      <Card className="max-w-2xl">
         <CardHeader>
-          <CardTitle>Organisation Details</CardTitle>
-          <CardDescription>Update your organisation's information.</CardDescription>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+            Organisation Details
+          </CardTitle>
+          <CardDescription>This information identifies your organisation in the system and on participant statements.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Organisation Name</Label>
+              <Label htmlFor="name">Organisation Name *</Label>
               <Input
                 id="name"
                 value={form.name}
@@ -90,6 +99,7 @@ export function OrgSettingsPage() {
                 onChange={(e) => setForm({ ...form, abn: e.target.value })}
                 placeholder="11 digit ABN"
                 maxLength={11}
+                className="max-w-xs font-mono"
               />
               {errors.Abn && <p className="text-sm text-destructive">{errors.Abn[0]}</p>}
             </div>
@@ -127,11 +137,17 @@ export function OrgSettingsPage() {
               />
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 pt-2">
               <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {saving ? 'Saving...' : 'Save Changes'}
               </Button>
-              {saved && <p className="text-sm text-green-600">Changes saved.</p>}
+              {saved && (
+                <span className="flex items-center gap-1.5 text-sm text-emerald-600">
+                  <Check className="h-4 w-4" />
+                  Changes saved
+                </span>
+              )}
             </div>
           </form>
         </CardContent>
