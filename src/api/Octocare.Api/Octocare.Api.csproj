@@ -9,12 +9,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="2.12.46" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Octocare.Application\Octocare.Application.csproj" />
     <ProjectReference Include="..\Octocare.Infrastructure\Octocare.Infrastructure.csproj" />
+    <ProjectReference Include="..\Octocare.ServiceDefaults\Octocare.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

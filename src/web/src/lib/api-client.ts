@@ -1,13 +1,25 @@
+import { ApiError } from './api-error';
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+
+let getTokenFn: (() => Promise<string>) | null = null;
+
+export function setTokenGetter(fn: () => Promise<string>) {
+  getTokenFn = fn;
+}
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (getTokenFn) {
+    try {
+      const token = await getTokenFn();
+      headers['Authorization'] = `Bearer ${token}`;
+    } catch {
+      // Token acquisition failed — proceed without auth header
+    }
   }
 
   const response = await fetch(`${API_URL}${path}`, {
@@ -17,9 +29,11 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   });
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    const problem = await response.json().catch(() => null);
+    throw new ApiError(response.status, response.statusText, problem);
   }
 
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -27,7 +41,7 @@ export function get<T>(path: string): Promise<T> {
   return request<T>('GET', path);
 }
 
-export function post<T>(path: string, body: unknown): Promise<T> {
+export function post<T>(path: string, body?: unknown): Promise<T> {
   return request<T>('POST', path, body);
 }
 

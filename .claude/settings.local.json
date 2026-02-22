@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "WebSearch",
+      "WebFetch(domain:www.entiprius.com)",
+      "WebFetch(domain:www.brevity.com.au)",
+      "WebFetch(domain:credsys.com.au)",
+      "WebFetch(domain:mypcorp.com.au)",
+      "WebFetch(domain:mcpm.net.au)",
+      "WebFetch(domain:splose.com)",
+      "Bash(dotnet:*)",
+      "Bash(node:*)",
+      "Bash(cd /c/sources/octocare && npm install -g pnpm 2>&1)",
+      "Bash(cd:*)",
+      "Bash(cd /c/sources/octocare/src/web && pnpm install 2>&1)",
+      "Bash(cd /c/sources/octocare/src/web && pnpm approve-builds esbuild 2>&1)",
+      "Bash(cd /c/sources/octocare/src/web && pnpm run build 2>&1)",
+      "Bash(cd /c/sources/octocare/src/web && pnpm test 2>&1)",
+      "Bash(cd /c/sources/octocare/src/web && pnpm dlx shadcn@latest init --defaults 2>&1)",
+      "WebFetch(domain:api.nuget.org)",
+      "WebFetch(domain:aspire.dev)"
+    ]
+  }
+}
