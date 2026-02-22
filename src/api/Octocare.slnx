@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="Octocare.AppHost/Octocare.AppHost.csproj" />
+  <Project Path="Octocare.ServiceDefaults/Octocare.ServiceDefaults.csproj" />
   <Project Path="Octocare.Api/Octocare.Api.csproj" />
   <Project Path="Octocare.Application/Octocare.Application.csproj" />
   <Project Path="Octocare.Domain/Octocare.Domain.csproj" />
