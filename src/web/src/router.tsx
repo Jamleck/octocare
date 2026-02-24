@@ -3,7 +3,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 import { AuthCallback } from '@/components/AuthCallback';
 import { AppLayout } from '@/layouts/AppLayout';
 import { DashboardPage } from '@/pages/DashboardPage';
-import { OrgSettingsPage } from '@/pages/OrgSettingsPage';
+import { OrgOptionsPage } from '@/pages/OrgOptionsPage';
 import { MembersPage } from '@/pages/MembersPage';
 import { ParticipantsListPage } from '@/pages/participants/ParticipantsListPage';
 import { ParticipantCreatePage } from '@/pages/participants/ParticipantCreatePage';
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'settings', element: <OrgSettingsPage /> },
+      { path: 'options', element: <OrgOptionsPage /> },
       { path: 'members', element: <MembersPage /> },
       { path: 'participants', element: <ParticipantsListPage /> },
       { path: 'participants/new', element: <ParticipantCreatePage /> },

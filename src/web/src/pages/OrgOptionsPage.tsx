@@ -9,7 +9,7 @@ import type { UpdateOrganisationRequest } from '@/types/api';
 import { ApiError } from '@/lib/api-error';
 import { Building2, Loader2, Check } from 'lucide-react';
 
-export function OrgSettingsPage() {
+export function OrgOptionsPage() {
   const { organisation, isLoading, updateOrganisation } = useOrganisation();
   const [form, setForm] = useState<UpdateOrganisationRequest>({
     name: '',
@@ -64,7 +64,7 @@ export function OrgSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Organisation Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Organisation Options</h1>
         <p className="text-sm text-muted-foreground">
           Manage your organisation's profile and contact information.
         </p>

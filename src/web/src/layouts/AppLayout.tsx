@@ -14,7 +14,7 @@ import {
   LayoutDashboard,
   Users,
   UserPlus,
-  Settings,
+  Settings as OptionsIcon,
   LogOut,
   ChevronRight,
 } from 'lucide-react';
@@ -23,7 +23,7 @@ const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/participants', label: 'Participants', icon: Users },
   { to: '/members', label: 'Team', icon: UserPlus },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/options', label: 'Options', icon: OptionsIcon },
 ];
 
 export function AppLayout() {
