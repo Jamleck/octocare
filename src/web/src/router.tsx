@@ -16,6 +16,8 @@ import { ProviderEditPage } from '@/pages/providers/ProviderEditPage';
 import { PlanCreatePage } from '@/pages/plans/PlanCreatePage';
 import { PlanDetailPage } from '@/pages/plans/PlanDetailPage';
 import { PlanEditPage } from '@/pages/plans/PlanEditPage';
+import { AgreementCreatePage } from '@/pages/agreements/AgreementCreatePage';
+import { AgreementDetailPage } from '@/pages/agreements/AgreementDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -38,8 +40,10 @@ export const router = createBrowserRouter([
       { path: 'participants/:id', element: <ParticipantDetailPage /> },
       { path: 'participants/:id/edit', element: <ParticipantEditPage /> },
       { path: 'participants/:participantId/plans/new', element: <PlanCreatePage /> },
+      { path: 'participants/:participantId/agreements/new', element: <AgreementCreatePage /> },
       { path: 'plans/:id', element: <PlanDetailPage /> },
       { path: 'plans/:id/edit', element: <PlanEditPage /> },
+      { path: 'agreements/:id', element: <AgreementDetailPage /> },
       { path: 'providers', element: <ProvidersListPage /> },
       { path: 'providers/new', element: <ProviderCreatePage /> },
       { path: 'providers/:id', element: <ProviderDetailPage /> },

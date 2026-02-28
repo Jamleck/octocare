@@ -26,6 +26,9 @@ public class OctocareDbContext : DbContext
     public DbSet<SupportItem> SupportItems => Set<SupportItem>();
     public DbSet<Plan> Plans => Set<Plan>();
     public DbSet<BudgetCategory> BudgetCategories => Set<BudgetCategory>();
+    public DbSet<ServiceAgreement> ServiceAgreements => Set<ServiceAgreement>();
+    public DbSet<ServiceAgreementItem> ServiceAgreementItems => Set<ServiceAgreementItem>();
+    public DbSet<ServiceBooking> ServiceBookings => Set<ServiceBooking>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,7 +51,10 @@ public class OctocareDbContext : DbContext
         modelBuilder.Entity<Plan>()
             .HasQueryFilter(p => _tenantContext.TenantId == null || p.TenantId == _tenantContext.TenantId);
 
-        // No query filter on Provider, StoredEvent, or BudgetCategory (filtered via Plan relationship) — they are shared across tenants
+        modelBuilder.Entity<ServiceAgreement>()
+            .HasQueryFilter(sa => _tenantContext.TenantId == null || sa.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, BudgetCategory, ServiceAgreementItem, or ServiceBooking — they are filtered via parent relationship
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -147,6 +153,23 @@ public class OctocareDbContext : DbContext
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(budgetCategory.CreatedAt)).CurrentValue = now;
                 entry.Property(nameof(budgetCategory.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceAgreement agreement)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(agreement.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(agreement.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceAgreementItem agreementItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(agreementItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceBooking booking)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(booking.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(booking.UpdatedAt)).CurrentValue = now;
             }
         }
     }

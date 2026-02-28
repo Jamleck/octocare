@@ -14,6 +14,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParticipant, deactivateParticipant } from '@/hooks/useParticipants';
 import { usePlans } from '@/hooks/usePlans';
+import { useServiceAgreements } from '@/hooks/useServiceAgreements';
 import {
   Table,
   TableBody,
@@ -35,13 +36,16 @@ import {
   Heart,
   FileText,
   Plus,
+  ClipboardList,
+  Building2,
 } from 'lucide-react';
-import type { PlanStatus } from '@/types/api';
+import type { PlanStatus, ServiceAgreementStatus } from '@/types/api';
 
 export function ParticipantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { participant, isLoading } = useParticipant(id!);
   const { plans, isLoading: plansLoading } = usePlans(id!);
+  const { agreements, isLoading: agreementsLoading } = useServiceAgreements(id!);
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -246,6 +250,80 @@ export function ParticipantDetailPage() {
         </CardContent>
       </Card>
 
+      {/* Service Agreements Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+              Service Agreements
+            </CardTitle>
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/participants/${participant.id}/agreements/new`}>
+                <Plus className="mr-1 h-3 w-3" />
+                Create Agreement
+              </Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {agreementsLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : agreements.length === 0 ? (
+            <div className="flex flex-col items-center py-6 text-center">
+              <div className="rounded-full bg-muted p-2.5">
+                <ClipboardList className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">No service agreements yet</p>
+              <Button variant="link" size="sm" className="mt-1" asChild>
+                <Link to={`/participants/${participant.id}/agreements/new`}>Create a service agreement</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Provider</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Items</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {agreements.map((agreement) => (
+                    <TableRow
+                      key={agreement.id}
+                      className="cursor-pointer transition-colors hover:bg-accent/50"
+                      onClick={() => navigate(`/agreements/${agreement.id}`)}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          {agreement.providerName}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">{agreement.planNumber}</TableCell>
+                      <TableCell>{new Date(agreement.startDate).toLocaleDateString('en-AU')}</TableCell>
+                      <TableCell>{new Date(agreement.endDate).toLocaleDateString('en-AU')}</TableCell>
+                      <TableCell>
+                        <AgreementStatusBadge status={agreement.status} />
+                      </TableCell>
+                      <TableCell className="text-right">{agreement.items.length}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
@@ -279,6 +357,23 @@ const planStatusConfig: Record<PlanStatus, { label: string; className: string }>
 
 function PlanStatusBadge({ status }: { status: PlanStatus }) {
   const config = planStatusConfig[status] || planStatusConfig.draft;
+  return (
+    <Badge variant="secondary" className={config.className}>
+      {config.label}
+    </Badge>
+  );
+}
+
+const agreementStatusConfig: Record<ServiceAgreementStatus, { label: string; className: string }> = {
+  draft: { label: 'Draft', className: 'border-yellow-200 bg-yellow-50 text-yellow-700' },
+  sent: { label: 'Sent', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+  active: { label: 'Active', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+  expired: { label: 'Expired', className: 'text-muted-foreground' },
+  terminated: { label: 'Terminated', className: 'border-red-200 bg-red-50 text-red-700' },
+};
+
+function AgreementStatusBadge({ status }: { status: ServiceAgreementStatus }) {
+  const config = agreementStatusConfig[status] || agreementStatusConfig.draft;
   return (
     <Badge variant="secondary" className={config.className}>
       {config.label}

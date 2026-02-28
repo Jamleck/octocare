@@ -112,7 +112,7 @@ public class DevDataSeeder
         await _db.SaveChangesAsync();
 
         // Seed plans and budget categories for the first participant
-        await SeedPlansAsync(org.Id, participants[0]);
+        await SeedPlansAsync(org.Id, participants[0], providers);
 
         // Seed price guide version and support items (shared reference data)
         await SeedPriceGuideAsync();
@@ -120,7 +120,7 @@ public class DevDataSeeder
         _logger.LogInformation("Development data seeded successfully");
     }
 
-    private async Task SeedPlansAsync(Guid tenantId, Participant participant)
+    private async Task SeedPlansAsync(Guid tenantId, Participant participant, Provider[] providers)
     {
         // Active plan with budget categories
         var activePlan = Plan.Create(tenantId, participant.Id, "NDIS-2025-001",
@@ -150,6 +150,49 @@ public class DevDataSeeder
             new DateOnly(2026, 7, 1), new DateOnly(2027, 6, 30));
 
         _db.Plans.Add(draftPlan);
+        await _db.SaveChangesAsync();
+
+        // Seed service agreements for the active plan
+        await SeedServiceAgreementsAsync(tenantId, participant, activePlan, categories, providers);
+    }
+
+    private async Task SeedServiceAgreementsAsync(Guid tenantId, Participant participant,
+        Plan activePlan, BudgetCategory[] categories, Provider[] providers)
+    {
+        // Agreement 1: Allied Health Plus — 2 items, 1 booking
+        var agreement1 = ServiceAgreement.Create(tenantId, participant.Id, providers[0].Id,
+            activePlan.Id, new DateOnly(2025, 7, 1), new DateOnly(2026, 6, 30));
+        agreement1.Activate();
+        _db.ServiceAgreements.Add(agreement1);
+        await _db.SaveChangesAsync();
+
+        var item1a = ServiceAgreementItem.Create(agreement1.Id,
+            "01_002_0107_1_1", 8445, "weekly"); // $84.45/hr - Assistance with Self-Care Activities
+        var item1b = ServiceAgreementItem.Create(agreement1.Id,
+            "01_015_0107_1_1", 8214, "fortnightly"); // $82.14/hr - Assistance with Daily Personal Activities
+        _db.ServiceAgreementItems.AddRange(item1a, item1b);
+        await _db.SaveChangesAsync();
+
+        // Core — Daily Activities booking
+        var booking1 = ServiceBooking.Create(agreement1.Id, categories[0].Id, 2000000); // $20,000.00
+        _db.ServiceBookings.Add(booking1);
+        await _db.SaveChangesAsync();
+
+        // Agreement 2: Therapeutic Solutions — 1 item, 1 booking
+        var agreement2 = ServiceAgreement.Create(tenantId, participant.Id, providers[1].Id,
+            activePlan.Id, new DateOnly(2025, 7, 1), new DateOnly(2026, 3, 31));
+        agreement2.Activate();
+        _db.ServiceAgreements.Add(agreement2);
+        await _db.SaveChangesAsync();
+
+        var item2 = ServiceAgreementItem.Create(agreement2.Id,
+            "04_104_0125_6_1", 9111, "weekly"); // $91.11/hr - Group-Based Community Social and Recreational
+        _db.ServiceAgreementItems.Add(item2);
+        await _db.SaveChangesAsync();
+
+        // Capacity Building — Social & Community Participation booking
+        var booking2 = ServiceBooking.Create(agreement2.Id, categories[1].Id, 800000); // $8,000.00
+        _db.ServiceBookings.Add(booking2);
         await _db.SaveChangesAsync();
     }
 

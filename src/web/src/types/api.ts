@@ -174,6 +174,62 @@ export interface CreateBudgetCategoryRequest {
   allocatedAmount: number;
 }
 
+// Service Agreement types
+export type ServiceAgreementStatus = 'draft' | 'sent' | 'active' | 'expired' | 'terminated';
+export type ServiceBookingStatus = 'active' | 'completed' | 'cancelled';
+
+export interface ServiceAgreement {
+  id: string;
+  participantId: string;
+  participantName: string;
+  providerId: string;
+  providerName: string;
+  planId: string;
+  planNumber: string;
+  status: ServiceAgreementStatus;
+  startDate: string;
+  endDate: string;
+  signedDocumentUrl?: string;
+  items: ServiceAgreementItem[];
+  bookings: ServiceBooking[];
+  createdAt: string;
+}
+
+export interface ServiceAgreementItem {
+  id: string;
+  supportItemNumber: string;
+  agreedRate: number;
+  frequency?: string;
+}
+
+export interface ServiceBooking {
+  id: string;
+  budgetCategoryId: string;
+  supportCategory: string;
+  allocatedAmount: number;
+  usedAmount: number;
+  status: ServiceBookingStatus;
+}
+
+export interface CreateServiceAgreementRequest {
+  providerId: string;
+  planId: string;
+  startDate: string;
+  endDate: string;
+  items: CreateServiceAgreementItemRequest[];
+}
+
+export interface CreateServiceAgreementItemRequest {
+  supportItemNumber: string;
+  agreedRate: number;
+  frequency?: string;
+}
+
+export interface CreateServiceBookingRequest {
+  budgetCategoryId: string;
+  allocatedAmount: number;
+}
+
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;
