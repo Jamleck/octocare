@@ -39,6 +39,9 @@ public class OctocareDbContext : DbContext
     public DbSet<BudgetAlert> BudgetAlerts => Set<BudgetAlert>();
     public DbSet<PlanTransition> PlanTransitions => Set<PlanTransition>();
     public DbSet<ParticipantStatement> ParticipantStatements => Set<ParticipantStatement>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<CommunicationLog> CommunicationLogs => Set<CommunicationLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,6 +84,15 @@ public class OctocareDbContext : DbContext
 
         modelBuilder.Entity<ParticipantStatement>()
             .HasQueryFilter(s => _tenantContext.TenantId == null || s.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<EmailTemplate>()
+            .HasQueryFilter(e => _tenantContext.TenantId == null || e.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Notification>()
+            .HasQueryFilter(n => _tenantContext.TenantId == null || n.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<CommunicationLog>()
+            .HasQueryFilter(c => _tenantContext.TenantId == null || c.TenantId == _tenantContext.TenantId);
 
         // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, ClaimLineItem, or PaymentItem — they are filtered via parent relationship
     }
@@ -251,6 +263,22 @@ public class OctocareDbContext : DbContext
             {
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(statement.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is EmailTemplate emailTemplate)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(emailTemplate.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(emailTemplate.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Notification notification)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(notification.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is CommunicationLog communicationLog)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(communicationLog.SentAt)).CurrentValue = now;
             }
         }
     }

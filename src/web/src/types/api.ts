@@ -598,3 +598,77 @@ export interface GenerateStatementRequest {
   periodStart: string;
   periodEnd: string;
 }
+
+// Notification types
+export type NotificationType =
+  | 'InvoiceSubmitted'
+  | 'InvoiceApproved'
+  | 'InvoiceRejected'
+  | 'PlanExpiring'
+  | 'BudgetAlert'
+  | 'ClaimSubmitted'
+  | 'ClaimOutcome'
+  | 'StatementGenerated'
+  | 'General';
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  link?: string;
+  createdAt: string;
+  readAt?: string;
+}
+
+export interface NotificationPagedResult {
+  items: Notification[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface UnreadCount {
+  count: number;
+}
+
+// Email Template types
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  isActive: boolean;
+  updatedAt: string;
+}
+
+export interface UpdateEmailTemplateRequest {
+  subject: string;
+  body: string;
+}
+
+export interface EmailTemplatePreview {
+  subject: string;
+  body: string;
+}
+
+// Communication Log types
+export interface CommunicationLogEntry {
+  id: string;
+  recipientEmail: string;
+  subject: string;
+  templateName?: string;
+  sentAt: string;
+  status: string;
+  errorMessage?: string;
+  relatedEntityType?: string;
+  relatedEntityId?: string;
+}
+
+export interface CommunicationLogPagedResult {
+  items: CommunicationLogEntry[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}

@@ -117,6 +117,9 @@ public class DevDataSeeder
         // Seed price guide version and support items (shared reference data)
         await SeedPriceGuideAsync();
 
+        // Seed default email templates
+        await SeedEmailTemplatesAsync(org.Id);
+
         _logger.LogInformation("Development data seeded successfully");
     }
 
@@ -441,6 +444,37 @@ public class DevDataSeeder
 
         _db.SupportItems.AddRange(items);
         await _db.SaveChangesAsync();
+    }
+
+    private async Task SeedEmailTemplatesAsync(Guid tenantId)
+    {
+        var templates = new (string Name, string Subject, string Body)[]
+        {
+            ("invoice_submitted",
+             "Invoice {{invoice_number}} Submitted",
+             "<h2>Invoice Submitted</h2><p>Invoice <strong>{{invoice_number}}</strong> has been submitted by {{provider_name}} for participant {{participant_name}}.</p><p>Amount: {{amount}}</p><p>Please review and approve the invoice at your earliest convenience.</p>"),
+
+            ("plan_expiring",
+             "Plan {{plan_number}} Expiring Soon",
+             "<h2>Plan Expiring</h2><p>Plan <strong>{{plan_number}}</strong> for {{participant_name}} will expire on {{expiry_date}}.</p><p>Days remaining: {{days_remaining}}</p><p>Please begin the plan transition process to ensure continuity of services.</p>"),
+
+            ("budget_alert",
+             "Budget Alert: {{category_name}}",
+             "<h2>Budget Alert</h2><p>A budget alert has been generated for plan {{plan_number}}.</p><p>Category: {{category_name}}</p><p>Utilisation: {{utilisation}}%</p><p>{{alert_message}}</p>"),
+
+            ("statement_ready",
+             "Participant Statement Ready - {{participant_name}}",
+             "<h2>Statement Ready</h2><p>A new participant statement has been generated for <strong>{{participant_name}}</strong>.</p><p>Period: {{period_start}} to {{period_end}}</p><p>The statement is now available for review and distribution.</p>")
+        };
+
+        foreach (var (name, subject, body) in templates)
+        {
+            var template = Domain.Entities.EmailTemplate.Create(tenantId, name, subject, body);
+            _db.EmailTemplates.Add(template);
+        }
+
+        await _db.SaveChangesAsync();
+        _logger.LogInformation("Seeded {Count} default email templates", templates.Length);
     }
 
     private static void SetId<T>(T entity, Guid id)

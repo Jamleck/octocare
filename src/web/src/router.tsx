@@ -27,6 +27,8 @@ import { ClaimDetailPage } from '@/pages/claims/ClaimDetailPage';
 import { PaymentsListPage } from '@/pages/payments/PaymentsListPage';
 import { PaymentDetailPage } from '@/pages/payments/PaymentDetailPage';
 import { ReportsPage } from '@/pages/reports/ReportsPage';
+import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
+import { EmailTemplatesPage } from '@/pages/settings/EmailTemplatesPage';
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +68,8 @@ export const router = createBrowserRouter([
       { path: 'payments', element: <PaymentsListPage /> },
       { path: 'payments/:id', element: <PaymentDetailPage /> },
       { path: 'reports', element: <ReportsPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
+      { path: 'settings/email-templates', element: <EmailTemplatesPage /> },
     ],
   },
 ]);

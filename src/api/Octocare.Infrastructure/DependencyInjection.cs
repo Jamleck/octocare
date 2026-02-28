@@ -43,6 +43,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<IAlertRepository, AlertRepository>();
         builder.Services.AddScoped<IPlanTransitionRepository, PlanTransitionRepository>();
         builder.Services.AddScoped<IStatementRepository, StatementRepository>();
+        builder.Services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+        builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+        builder.Services.AddScoped<ICommunicationLogRepository, CommunicationLogRepository>();
 
         // External integrations (mock for MVP)
         builder.Services.AddScoped<IProdaPaceClient, MockProdaPaceClient>();

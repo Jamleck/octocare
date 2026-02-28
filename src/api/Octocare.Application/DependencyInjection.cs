@@ -30,6 +30,9 @@ public static class DependencyInjection
         services.AddScoped<ExcelExportService>();
         services.AddScoped<StatementPdfGenerator>();
         services.AddScoped<StatementService>();
+        services.AddScoped<EmailTemplateService>();
+        services.AddScoped<NotificationService>();
+        services.AddScoped<CommunicationLogService>();
 
         return services;
     }

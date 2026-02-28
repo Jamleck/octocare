@@ -23,6 +23,7 @@ import {
   LogOut,
   ChevronRight,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -82,7 +83,8 @@ export function AppLayout() {
             ))}
           </nav>
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
