@@ -97,13 +97,13 @@ public class ReportsController : ControllerBase
     [HttpGet("api/reports/audit-trail")]
     [Authorize(Policy = "CanReadFinance")]
     public async Task<IActionResult> AuditTrail(
-        [FromQuery] DateTime? from = null,
-        [FromQuery] DateTime? to = null,
+        [FromQuery] DateTimeOffset? from = null,
+        [FromQuery] DateTimeOffset? to = null,
         [FromQuery] string format = "json",
         CancellationToken ct = default)
     {
-        var fromDate = from ?? DateTime.UtcNow.AddDays(-30);
-        var toDate = to ?? DateTime.UtcNow;
+        var fromDate = from ?? DateTimeOffset.UtcNow.AddDays(-30);
+        var toDate = to ?? DateTimeOffset.UtcNow;
 
         var data = await _reportService.GetAuditTrailAsync(fromDate, toDate, ct);
 

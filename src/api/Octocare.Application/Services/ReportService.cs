@@ -187,7 +187,7 @@ public class ReportService
         return rows;
     }
 
-    public async Task<IReadOnlyList<AuditTrailRow>> GetAuditTrailAsync(DateTime from, DateTime to, CancellationToken ct)
+    public async Task<IReadOnlyList<AuditTrailRow>> GetAuditTrailAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct)
     {
         var events = await _eventStore.GetByDateRangeAsync(from, to, ct: ct);
 

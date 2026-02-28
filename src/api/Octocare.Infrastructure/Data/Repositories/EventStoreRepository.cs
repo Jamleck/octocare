@@ -53,19 +53,16 @@ public class EventStoreRepository : IEventStore
             .OrderBy(e => e.Version)
             .Select(e => new StoredEventDto(
                 e.Id, e.StreamId, e.StreamType, e.EventType,
-                e.Payload, e.Metadata, e.Version, e.CreatedAt.UtcDateTime))
+                e.Payload, e.Metadata, e.Version, e.CreatedAt))
             .ToListAsync(ct);
 
         return events;
     }
 
-    public async Task<IReadOnlyList<StoredEventDto>> GetByDateRangeAsync(DateTime from, DateTime to, string? streamType = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<StoredEventDto>> GetByDateRangeAsync(DateTimeOffset from, DateTimeOffset to, string? streamType = null, CancellationToken ct = default)
     {
-        var fromOffset = new DateTimeOffset(from, TimeSpan.Zero);
-        var toOffset = new DateTimeOffset(to, TimeSpan.Zero);
-
         var query = _db.Events
-            .Where(e => e.CreatedAt >= fromOffset && e.CreatedAt <= toOffset);
+            .Where(e => e.CreatedAt >= from && e.CreatedAt <= to);
 
         if (!string.IsNullOrWhiteSpace(streamType))
             query = query.Where(e => e.StreamType == streamType);
@@ -74,7 +71,7 @@ public class EventStoreRepository : IEventStore
             .OrderByDescending(e => e.CreatedAt)
             .Select(e => new StoredEventDto(
                 e.Id, e.StreamId, e.StreamType, e.EventType,
-                e.Payload, e.Metadata, e.Version, e.CreatedAt.UtcDateTime))
+                e.Payload, e.Metadata, e.Version, e.CreatedAt))
             .Take(1000)
             .ToListAsync(ct);
 

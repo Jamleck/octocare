@@ -17,7 +17,7 @@ public class EmailTemplatesController : ControllerBase
     }
 
     [HttpGet("api/email-templates")]
-    [Authorize(Policy = "CanWriteFinance")]
+    [Authorize(Policy = "CanManageOrg")]
     public async Task<ActionResult<IReadOnlyList<EmailTemplateDto>>> GetAll(CancellationToken ct = default)
     {
         var templates = await _emailTemplateService.GetAllAsync(ct);
@@ -25,7 +25,7 @@ public class EmailTemplatesController : ControllerBase
     }
 
     [HttpGet("api/email-templates/{id:guid}")]
-    [Authorize(Policy = "CanWriteFinance")]
+    [Authorize(Policy = "CanManageOrg")]
     public async Task<ActionResult<EmailTemplateDto>> GetById(Guid id, CancellationToken ct = default)
     {
         var template = await _emailTemplateService.GetByIdAsync(id, ct);
@@ -33,7 +33,7 @@ public class EmailTemplatesController : ControllerBase
     }
 
     [HttpPut("api/email-templates/{id:guid}")]
-    [Authorize(Policy = "CanWriteFinance")]
+    [Authorize(Policy = "CanManageOrg")]
     public async Task<ActionResult<EmailTemplateDto>> Update(Guid id, [FromBody] UpdateEmailTemplateRequest request, CancellationToken ct = default)
     {
         try
@@ -48,7 +48,7 @@ public class EmailTemplatesController : ControllerBase
     }
 
     [HttpPost("api/email-templates/{id:guid}/preview")]
-    [Authorize(Policy = "CanWriteFinance")]
+    [Authorize(Policy = "CanManageOrg")]
     public async Task<ActionResult<EmailTemplatePreviewDto>> Preview(Guid id, [FromBody] PreviewEmailTemplateRequest request, CancellationToken ct = default)
     {
         try

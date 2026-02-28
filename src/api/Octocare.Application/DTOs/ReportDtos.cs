@@ -41,7 +41,7 @@ public record ParticipantSummaryRow(
     decimal UtilisationPercent);
 
 public record AuditTrailRow(
-    DateTime Timestamp,
+    DateTimeOffset Timestamp,
     string StreamType,
     string EventType,
     string StreamId,

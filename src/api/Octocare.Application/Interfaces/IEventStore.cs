@@ -5,7 +5,7 @@ public interface IEventStore
     Task AppendAsync(Guid streamId, string streamType, string eventType, object payload, int expectedVersion, object? metadata = null, CancellationToken ct = default);
     Task<IReadOnlyList<StoredEventDto>> GetStreamAsync(Guid streamId, CancellationToken ct = default);
     Task<IReadOnlyList<StoredEventDto>> GetStreamAsync(Guid streamId, int fromVersion, CancellationToken ct = default);
-    Task<IReadOnlyList<StoredEventDto>> GetByDateRangeAsync(DateTime from, DateTime to, string? streamType = null, CancellationToken ct = default);
+    Task<IReadOnlyList<StoredEventDto>> GetByDateRangeAsync(DateTimeOffset from, DateTimeOffset to, string? streamType = null, CancellationToken ct = default);
 }
 
-public record StoredEventDto(Guid Id, Guid StreamId, string StreamType, string EventType, string Payload, string? Metadata, int Version, DateTime CreatedAt);
+public record StoredEventDto(Guid Id, Guid StreamId, string StreamType, string EventType, string Payload, string? Metadata, int Version, DateTimeOffset CreatedAt);
