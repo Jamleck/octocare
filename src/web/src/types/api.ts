@@ -82,6 +82,59 @@ export interface UpdateParticipantRequest {
   nomineeRelationship?: string;
 }
 
+export interface Provider {
+  id: string;
+  name: string;
+  abn?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateProviderRequest {
+  name: string;
+  abn?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+}
+
+export interface UpdateProviderRequest {
+  name: string;
+  abn?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+}
+
+export type SupportCategory = 'Core' | 'CapacityBuilding' | 'Capital';
+export type UnitOfMeasure = 'Hour' | 'Each' | 'Day' | 'Week' | 'Month' | 'Year';
+
+export interface PriceGuideVersion {
+  id: string;
+  name: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isCurrent: boolean;
+}
+
+export interface SupportItem {
+  id: string;
+  itemNumber: string;
+  name: string;
+  supportCategory: SupportCategory;
+  supportPurpose: string;
+  unit: UnitOfMeasure;
+  priceLimitNational: number;
+  priceLimitRemote: number;
+  priceLimitVeryRemote: number;
+  isTtpEligible: boolean;
+  cancellationRule: string;
+  claimType: string;
+}
+
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;

@@ -25,6 +25,10 @@ public static class AuthorizationExtensions
                 policy.Requirements.Add(new PermissionRequirement(Permission.FinanceRead)));
             options.AddPolicy("CanWriteFinance", policy =>
                 policy.Requirements.Add(new PermissionRequirement(Permission.FinanceWrite)));
+            options.AddPolicy("CanReadProviders", policy =>
+                policy.Requirements.Add(new PermissionRequirement(Permission.ProvidersRead)));
+            options.AddPolicy("CanWriteProviders", policy =>
+                policy.Requirements.Add(new PermissionRequirement(Permission.ProvidersWrite)));
         });
 
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();

@@ -30,6 +30,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
         builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+        builder.Services.AddScoped<IEventStore, EventStoreRepository>();
+        builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+        builder.Services.AddScoped<IPriceGuideRepository, PriceGuideRepository>();
 
         // Seeding
         builder.Services.AddScoped<DevDataSeeder>();

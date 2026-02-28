@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Users,
   UserPlus,
+  Building2,
   Settings,
   LogOut,
   ChevronRight,
@@ -22,6 +23,7 @@ import {
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/participants', label: 'Participants', icon: Users },
+  { to: '/providers', label: 'Providers', icon: Building2 },
   { to: '/members', label: 'Team', icon: UserPlus },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

@@ -19,6 +19,11 @@ public class OctocareDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<UserOrgMembership> UserOrgMemberships => Set<UserOrgMembership>();
     public DbSet<Participant> Participants => Set<Participant>();
+    public DbSet<StoredEvent> Events => Set<StoredEvent>();
+    public DbSet<Provider> Providers => Set<Provider>();
+    public DbSet<TenantProviderRelationship> TenantProviderRelationships => Set<TenantProviderRelationship>();
+    public DbSet<PriceGuideVersion> PriceGuideVersions => Set<PriceGuideVersion>();
+    public DbSet<SupportItem> SupportItems => Set<SupportItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +39,11 @@ public class OctocareDbContext : DbContext
 
         modelBuilder.Entity<Participant>()
             .HasQueryFilter(p => _tenantContext.TenantId == null || p.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<TenantProviderRelationship>()
+            .HasQueryFilter(r => _tenantContext.TenantId == null || r.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider or StoredEvent — they are shared across tenants
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -97,6 +107,29 @@ public class OctocareDbContext : DbContext
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(participant.CreatedAt)).CurrentValue = now;
                 entry.Property(nameof(participant.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Provider provider)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(provider.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(provider.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is TenantProviderRelationship relationship)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(relationship.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(relationship.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PriceGuideVersion version)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(version.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(version.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is SupportItem supportItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(supportItem.CreatedAt)).CurrentValue = now;
             }
         }
     }
