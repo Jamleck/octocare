@@ -9,6 +9,26 @@ import { ParticipantsListPage } from '@/pages/participants/ParticipantsListPage'
 import { ParticipantCreatePage } from '@/pages/participants/ParticipantCreatePage';
 import { ParticipantDetailPage } from '@/pages/participants/ParticipantDetailPage';
 import { ParticipantEditPage } from '@/pages/participants/ParticipantEditPage';
+import { ProvidersListPage } from '@/pages/providers/ProvidersListPage';
+import { ProviderCreatePage } from '@/pages/providers/ProviderCreatePage';
+import { ProviderDetailPage } from '@/pages/providers/ProviderDetailPage';
+import { ProviderEditPage } from '@/pages/providers/ProviderEditPage';
+import { PlanCreatePage } from '@/pages/plans/PlanCreatePage';
+import { PlanDetailPage } from '@/pages/plans/PlanDetailPage';
+import { PlanEditPage } from '@/pages/plans/PlanEditPage';
+import { AgreementCreatePage } from '@/pages/agreements/AgreementCreatePage';
+import { AgreementDetailPage } from '@/pages/agreements/AgreementDetailPage';
+import { InvoicesListPage } from '@/pages/invoices/InvoicesListPage';
+import { InvoiceCreatePage } from '@/pages/invoices/InvoiceCreatePage';
+import { InvoiceDetailPage } from '@/pages/invoices/InvoiceDetailPage';
+import { ClaimsListPage } from '@/pages/claims/ClaimsListPage';
+import { ClaimCreatePage } from '@/pages/claims/ClaimCreatePage';
+import { ClaimDetailPage } from '@/pages/claims/ClaimDetailPage';
+import { PaymentsListPage } from '@/pages/payments/PaymentsListPage';
+import { PaymentDetailPage } from '@/pages/payments/PaymentDetailPage';
+import { ReportsPage } from '@/pages/reports/ReportsPage';
+import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
+import { EmailTemplatesPage } from '@/pages/settings/EmailTemplatesPage';
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +50,26 @@ export const router = createBrowserRouter([
       { path: 'participants/new', element: <ParticipantCreatePage /> },
       { path: 'participants/:id', element: <ParticipantDetailPage /> },
       { path: 'participants/:id/edit', element: <ParticipantEditPage /> },
+      { path: 'participants/:participantId/plans/new', element: <PlanCreatePage /> },
+      { path: 'participants/:participantId/agreements/new', element: <AgreementCreatePage /> },
+      { path: 'plans/:id', element: <PlanDetailPage /> },
+      { path: 'plans/:id/edit', element: <PlanEditPage /> },
+      { path: 'agreements/:id', element: <AgreementDetailPage /> },
+      { path: 'invoices', element: <InvoicesListPage /> },
+      { path: 'invoices/new', element: <InvoiceCreatePage /> },
+      { path: 'invoices/:id', element: <InvoiceDetailPage /> },
+      { path: 'claims', element: <ClaimsListPage /> },
+      { path: 'claims/new', element: <ClaimCreatePage /> },
+      { path: 'claims/:id', element: <ClaimDetailPage /> },
+      { path: 'providers', element: <ProvidersListPage /> },
+      { path: 'providers/new', element: <ProviderCreatePage /> },
+      { path: 'providers/:id', element: <ProviderDetailPage /> },
+      { path: 'providers/:id/edit', element: <ProviderEditPage /> },
+      { path: 'payments', element: <PaymentsListPage /> },
+      { path: 'payments/:id', element: <PaymentDetailPage /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
+      { path: 'settings/email-templates', element: <EmailTemplatesPage /> },
     ],
   },
 ]);

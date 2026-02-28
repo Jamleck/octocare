@@ -14,14 +14,25 @@ import {
   LayoutDashboard,
   Users,
   UserPlus,
+  Building2,
+  FileText,
+  Send,
+  Banknote,
+  BarChart3,
   Settings,
   LogOut,
   ChevronRight,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/participants', label: 'Participants', icon: Users },
+  { to: '/providers', label: 'Providers', icon: Building2 },
+  { to: '/invoices', label: 'Invoices', icon: FileText },
+  { to: '/claims', label: 'Claims', icon: Send },
+  { to: '/payments', label: 'Payments', icon: Banknote },
+  { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/members', label: 'Team', icon: UserPlus },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -72,7 +83,8 @@ export function AppLayout() {
             ))}
           </nav>
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">

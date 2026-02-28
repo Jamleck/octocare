@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { useAuth } from '@/hooks/useAuth';
+import { useParticipants } from '@/hooks/useParticipants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,37 +14,6 @@ import {
   Activity,
 } from 'lucide-react';
 
-const kpiCards = [
-  {
-    title: 'Active Participants',
-    value: '--',
-    icon: Users,
-    color: 'text-primary bg-primary/10',
-    description: 'Total managed',
-  },
-  {
-    title: 'Pending Invoices',
-    value: '--',
-    icon: FileText,
-    color: 'text-amber-600 bg-amber-50',
-    description: 'Awaiting review',
-  },
-  {
-    title: 'Claims This Month',
-    value: '--',
-    icon: Send,
-    color: 'text-emerald-600 bg-emerald-50',
-    description: 'Submitted to NDIA',
-  },
-  {
-    title: 'Plans Expiring Soon',
-    value: '--',
-    icon: Clock,
-    color: 'text-rose-600 bg-rose-50',
-    description: 'Within 90 days',
-  },
-];
-
 const quickActions = [
   { label: 'Add Participant', to: '/participants/new', icon: UserPlus },
   { label: 'View Participants', to: '/participants', icon: ClipboardList },
@@ -52,6 +22,38 @@ const quickActions = [
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const { totalCount, isLoading: participantsLoading } = useParticipants(1, 1);
+
+  const kpiCards = [
+    {
+      title: 'Active Participants',
+      value: participantsLoading ? '...' : String(totalCount),
+      icon: Users,
+      color: 'text-primary bg-primary/10',
+      description: 'Total managed',
+    },
+    {
+      title: 'Pending Invoices',
+      value: '--',
+      icon: FileText,
+      color: 'text-amber-600 bg-amber-50',
+      description: 'Awaiting review',
+    },
+    {
+      title: 'Claims This Month',
+      value: '--',
+      icon: Send,
+      color: 'text-emerald-600 bg-emerald-50',
+      description: 'Submitted to NDIA',
+    },
+    {
+      title: 'Plans Expiring Soon',
+      value: '--',
+      icon: Clock,
+      color: 'text-rose-600 bg-rose-50',
+      description: 'Within 90 days',
+    },
+  ];
 
   const greeting = getGreeting();
 

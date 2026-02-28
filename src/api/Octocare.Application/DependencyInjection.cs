@@ -10,6 +10,29 @@ public static class DependencyInjection
         services.AddScoped<OrganisationService>();
         services.AddScoped<MemberService>();
         services.AddScoped<ParticipantService>();
+        services.AddScoped<ProviderService>();
+        services.AddScoped<PriceGuideService>();
+        services.AddScoped<PlanService>();
+        services.AddScoped<ServiceAgreementService>();
+        services.AddScoped<InvoiceService>();
+        services.AddScoped<InvoiceValidationService>();
+        services.AddScoped<BudgetProjectionService>();
+        services.AddScoped<PmFeeService>();
+        services.AddScoped<ClaimService>();
+        services.AddScoped<NdiaCsvExporter>();
+        services.AddScoped<PaymentService>();
+        services.AddScoped<AbaFileGenerator>();
+        services.AddScoped<AlertService>();
+        services.AddScoped<PlanTransitionService>();
+        services.AddScoped<ProdaSyncService>();
+        services.AddScoped<ReportService>();
+        services.AddScoped<CsvExportService>();
+        services.AddScoped<ExcelExportService>();
+        services.AddScoped<StatementPdfGenerator>();
+        services.AddScoped<StatementService>();
+        services.AddScoped<EmailTemplateService>();
+        services.AddScoped<NotificationService>();
+        services.AddScoped<CommunicationLogService>();
 
         return services;
     }

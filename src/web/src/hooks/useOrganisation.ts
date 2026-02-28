@@ -7,13 +7,14 @@ export function useOrganisation() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchOrganisation = useCallback(async () => {
+  const fetchOrganisation = useCallback(async (signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await get<Organisation>('/api/organisations/current');
+      const data = await get<Organisation>('/api/organisations/current', { signal });
       setOrganisation(data);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(err instanceof Error ? err : new Error('Failed to fetch organisation'));
     } finally {
       setIsLoading(false);
@@ -21,7 +22,9 @@ export function useOrganisation() {
   }, []);
 
   useEffect(() => {
-    fetchOrganisation();
+    const controller = new AbortController();
+    fetchOrganisation(controller.signal);
+    return () => controller.abort();
   }, [fetchOrganisation]);
 
   const updateOrganisation = async (request: UpdateOrganisationRequest) => {
@@ -30,5 +33,5 @@ export function useOrganisation() {
     return data;
   };
 
-  return { organisation, isLoading, error, updateOrganisation, refetch: fetchOrganisation };
+  return { organisation, isLoading, error, updateOrganisation, refetch: () => fetchOrganisation() };
 }
