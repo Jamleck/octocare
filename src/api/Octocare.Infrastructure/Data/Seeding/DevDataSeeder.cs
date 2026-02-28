@@ -154,6 +154,9 @@ public class DevDataSeeder
 
         // Seed service agreements for the active plan
         await SeedServiceAgreementsAsync(tenantId, participant, activePlan, categories, providers);
+
+        // Seed invoices for the active plan
+        await SeedInvoicesAsync(tenantId, participant, activePlan, categories, providers);
     }
 
     private async Task SeedServiceAgreementsAsync(Guid tenantId, Participant participant,
@@ -193,6 +196,79 @@ public class DevDataSeeder
         // Capacity Building — Social & Community Participation booking
         var booking2 = ServiceBooking.Create(agreement2.Id, categories[1].Id, 800000); // $8,000.00
         _db.ServiceBookings.Add(booking2);
+        await _db.SaveChangesAsync();
+    }
+
+    private async Task SeedInvoicesAsync(Guid tenantId, Participant participant,
+        Plan activePlan, BudgetCategory[] categories, Provider[] providers)
+    {
+        // Invoice 1: Submitted — from Allied Health Plus
+        // 4 * 8445 + 4 * 8445 + 8.25 * 8214 = 33780 + 33780 + 67766 = 135326 cents ($1,353.26)
+        var invoice1 = Invoice.Create(tenantId, providers[0].Id, participant.Id,
+            activePlan.Id, "INV-2025-001",
+            new DateOnly(2025, 7, 1), new DateOnly(2025, 7, 31),
+            "Weekly assistance with self-care activities");
+        SetProperty(invoice1, "TotalAmount", 135326L);
+
+        _db.Invoices.Add(invoice1);
+        await _db.SaveChangesAsync();
+
+        _db.InvoiceLineItems.AddRange(
+            InvoiceLineItem.Create(invoice1.Id,
+                "01_002_0107_1_1", "Assistance with Self-Care Activities - Weekday",
+                new DateOnly(2025, 7, 7), 4m, 8445, categories[0].Id),
+            InvoiceLineItem.Create(invoice1.Id,
+                "01_002_0107_1_1", "Assistance with Self-Care Activities - Weekday",
+                new DateOnly(2025, 7, 14), 4m, 8445, categories[0].Id),
+            InvoiceLineItem.Create(invoice1.Id,
+                "01_015_0107_1_1", "Assistance with Daily Personal Activities",
+                new DateOnly(2025, 7, 21), 8.25m, 8214, categories[0].Id)
+        );
+        await _db.SaveChangesAsync();
+
+        // Invoice 2: Approved — from Therapeutic Solutions
+        // 12 * 9111 + 12 * 9111 = 109332 + 109332 = 218664 cents ($2,186.64)
+        var invoice2 = Invoice.Create(tenantId, providers[1].Id, participant.Id,
+            activePlan.Id, "INV-2025-002",
+            new DateOnly(2025, 8, 1), new DateOnly(2025, 8, 31),
+            "Group-based community participation activities");
+        SetProperty(invoice2, "TotalAmount", 218664L);
+        invoice2.Approve();
+
+        _db.Invoices.Add(invoice2);
+        await _db.SaveChangesAsync();
+
+        _db.InvoiceLineItems.AddRange(
+            InvoiceLineItem.Create(invoice2.Id,
+                "04_104_0125_6_1", "Group-Based Community Activities - Week 1",
+                new DateOnly(2025, 8, 4), 12m, 9111, categories[1].Id),
+            InvoiceLineItem.Create(invoice2.Id,
+                "04_104_0125_6_1", "Group-Based Community Activities - Week 2",
+                new DateOnly(2025, 8, 11), 12m, 9111, categories[1].Id)
+        );
+        await _db.SaveChangesAsync();
+
+        // Invoice 3: Paid — from Community Care Services
+        // 1 * 65000 + 1 * 30000 = 95000 cents ($950.00)
+        var invoice3 = Invoice.Create(tenantId, providers[2].Id, participant.Id,
+            activePlan.Id, "INV-2025-003",
+            new DateOnly(2025, 9, 1), new DateOnly(2025, 9, 30),
+            "Assistive equipment delivery");
+        SetProperty(invoice3, "TotalAmount", 95000L);
+        invoice3.Approve();
+        invoice3.MarkPaid();
+
+        _db.Invoices.Add(invoice3);
+        await _db.SaveChangesAsync();
+
+        _db.InvoiceLineItems.AddRange(
+            InvoiceLineItem.Create(invoice3.Id,
+                "05_060_0115_3_1", "Assistive Equipment - Personal Care Item",
+                new DateOnly(2025, 9, 10), 1m, 65000, categories[2].Id),
+            InvoiceLineItem.Create(invoice3.Id,
+                "05_060_0115_3_1", "Assistive Equipment - Delivery & Setup",
+                new DateOnly(2025, 9, 15), 1m, 30000, categories[2].Id)
+        );
         await _db.SaveChangesAsync();
     }
 

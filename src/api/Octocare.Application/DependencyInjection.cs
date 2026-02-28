@@ -14,6 +14,8 @@ public static class DependencyInjection
         services.AddScoped<PriceGuideService>();
         services.AddScoped<PlanService>();
         services.AddScoped<ServiceAgreementService>();
+        services.AddScoped<InvoiceService>();
+        services.AddScoped<InvoiceValidationService>();
 
         return services;
     }

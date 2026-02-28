@@ -18,6 +18,9 @@ import { PlanDetailPage } from '@/pages/plans/PlanDetailPage';
 import { PlanEditPage } from '@/pages/plans/PlanEditPage';
 import { AgreementCreatePage } from '@/pages/agreements/AgreementCreatePage';
 import { AgreementDetailPage } from '@/pages/agreements/AgreementDetailPage';
+import { InvoicesListPage } from '@/pages/invoices/InvoicesListPage';
+import { InvoiceCreatePage } from '@/pages/invoices/InvoiceCreatePage';
+import { InvoiceDetailPage } from '@/pages/invoices/InvoiceDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +47,9 @@ export const router = createBrowserRouter([
       { path: 'plans/:id', element: <PlanDetailPage /> },
       { path: 'plans/:id/edit', element: <PlanEditPage /> },
       { path: 'agreements/:id', element: <AgreementDetailPage /> },
+      { path: 'invoices', element: <InvoicesListPage /> },
+      { path: 'invoices/new', element: <InvoiceCreatePage /> },
+      { path: 'invoices/:id', element: <InvoiceDetailPage /> },
       { path: 'providers', element: <ProvidersListPage /> },
       { path: 'providers/new', element: <ProviderCreatePage /> },
       { path: 'providers/:id', element: <ProviderDetailPage /> },

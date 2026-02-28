@@ -29,6 +29,8 @@ public class OctocareDbContext : DbContext
     public DbSet<ServiceAgreement> ServiceAgreements => Set<ServiceAgreement>();
     public DbSet<ServiceAgreementItem> ServiceAgreementItems => Set<ServiceAgreementItem>();
     public DbSet<ServiceBooking> ServiceBookings => Set<ServiceBooking>();
+    public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,7 +56,10 @@ public class OctocareDbContext : DbContext
         modelBuilder.Entity<ServiceAgreement>()
             .HasQueryFilter(sa => _tenantContext.TenantId == null || sa.TenantId == _tenantContext.TenantId);
 
-        // No query filter on Provider, StoredEvent, BudgetCategory, ServiceAgreementItem, or ServiceBooking — they are filtered via parent relationship
+        modelBuilder.Entity<Invoice>()
+            .HasQueryFilter(i => _tenantContext.TenantId == null || i.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, BudgetCategory, ServiceAgreementItem, ServiceBooking, or InvoiceLineItem — they are filtered via parent relationship
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -170,6 +175,17 @@ public class OctocareDbContext : DbContext
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(booking.CreatedAt)).CurrentValue = now;
                 entry.Property(nameof(booking.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Invoice invoice)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(invoice.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(invoice.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is InvoiceLineItem lineItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(lineItem.CreatedAt)).CurrentValue = now;
             }
         }
     }

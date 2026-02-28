@@ -237,6 +237,69 @@ export interface PagedResult<T> {
   pageSize: number;
 }
 
+// Invoice types
+export type InvoiceStatus = 'submitted' | 'under_review' | 'approved' | 'rejected' | 'disputed' | 'paid';
+
+export interface Invoice {
+  id: string;
+  providerId: string;
+  providerName: string;
+  participantId: string;
+  participantName: string;
+  planId: string;
+  planNumber: string;
+  invoiceNumber: string;
+  servicePeriodStart: string;
+  servicePeriodEnd: string;
+  totalAmount: number;
+  status: InvoiceStatus;
+  source: string;
+  notes?: string;
+  lineItems: InvoiceLineItem[];
+  createdAt: string;
+}
+
+export interface InvoiceLineItem {
+  id: string;
+  supportItemNumber: string;
+  description: string;
+  serviceDate: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+  budgetCategoryId?: string;
+  supportCategory?: string;
+  validationStatus: string;
+  validationMessage?: string;
+}
+
+export interface CreateInvoiceRequest {
+  providerId: string;
+  participantId: string;
+  planId: string;
+  invoiceNumber: string;
+  servicePeriodStart: string;
+  servicePeriodEnd: string;
+  notes?: string;
+  lineItems: CreateInvoiceLineItemRequest[];
+}
+
+export interface CreateInvoiceLineItemRequest {
+  supportItemNumber: string;
+  description: string;
+  serviceDate: string;
+  quantity: number;
+  rate: number;
+  budgetCategoryId?: string;
+}
+
+export interface InvoicePagedResult {
+  items: Invoice[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface ProblemDetails {
   type?: string;
   title?: string;
