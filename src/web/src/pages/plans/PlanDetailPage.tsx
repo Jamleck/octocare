@@ -23,6 +23,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePlan, activatePlan, addBudgetCategory } from '@/hooks/usePlans';
 import { ErrorBanner } from '@/components/ErrorBanner';
+import { BudgetOverviewCard } from '@/components/BudgetOverviewCard';
 import {
   ArrowLeft,
   Pencil,
@@ -315,6 +316,11 @@ export function PlanDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Budget Overview — shown for active/expiring plans with budget categories */}
+      {!isDraft && plan.budgetCategories.length > 0 && (
+        <BudgetOverviewCard planId={plan.id} />
+      )}
 
       {/* Add Budget Category Dialog */}
       <Dialog open={addCategoryOpen} onOpenChange={setAddCategoryOpen}>

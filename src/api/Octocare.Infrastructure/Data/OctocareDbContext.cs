@@ -31,6 +31,9 @@ public class OctocareDbContext : DbContext
     public DbSet<ServiceBooking> ServiceBookings => Set<ServiceBooking>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();
+    public DbSet<BudgetProjection> BudgetProjections => Set<BudgetProjection>();
+    public DbSet<Claim> Claims => Set<Claim>();
+    public DbSet<ClaimLineItem> ClaimLineItems => Set<ClaimLineItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,7 +62,10 @@ public class OctocareDbContext : DbContext
         modelBuilder.Entity<Invoice>()
             .HasQueryFilter(i => _tenantContext.TenantId == null || i.TenantId == _tenantContext.TenantId);
 
-        // No query filter on Provider, StoredEvent, BudgetCategory, ServiceAgreementItem, ServiceBooking, or InvoiceLineItem — they are filtered via parent relationship
+        modelBuilder.Entity<Claim>()
+            .HasQueryFilter(c => _tenantContext.TenantId == null || c.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, or ClaimLineItem — they are filtered via parent relationship
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -186,6 +192,23 @@ public class OctocareDbContext : DbContext
             {
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(lineItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetProjection projection)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(projection.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(projection.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Claim claim)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(claim.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(claim.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ClaimLineItem claimLineItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(claimLineItem.CreatedAt)).CurrentValue = now;
             }
         }
     }

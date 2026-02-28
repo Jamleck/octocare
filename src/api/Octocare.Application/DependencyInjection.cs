@@ -16,6 +16,10 @@ public static class DependencyInjection
         services.AddScoped<ServiceAgreementService>();
         services.AddScoped<InvoiceService>();
         services.AddScoped<InvoiceValidationService>();
+        services.AddScoped<BudgetProjectionService>();
+        services.AddScoped<PmFeeService>();
+        services.AddScoped<ClaimService>();
+        services.AddScoped<NdiaCsvExporter>();
 
         return services;
     }

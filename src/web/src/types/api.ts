@@ -307,3 +307,82 @@ export interface ProblemDetails {
   detail?: string;
   errors?: Record<string, string[]>;
 }
+
+// Claim types
+export type ClaimStatus = 'draft' | 'submitted' | 'accepted' | 'partially_rejected' | 'rejected';
+export type ClaimLineItemStatus = 'pending' | 'accepted' | 'rejected';
+
+export interface Claim {
+  id: string;
+  batchNumber: string;
+  status: ClaimStatus;
+  totalAmount: number;
+  ndiaReference?: string;
+  submissionDate?: string;
+  responseDate?: string;
+  lineItems: ClaimLineItemDetail[];
+  createdAt: string;
+}
+
+export interface ClaimLineItemDetail {
+  id: string;
+  invoiceLineItemId: string;
+  supportItemNumber: string;
+  description: string;
+  serviceDate: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+  invoiceNumber: string;
+  providerName: string;
+  participantName: string;
+  status: ClaimLineItemStatus;
+  rejectionReason?: string;
+}
+
+export interface CreateClaimRequest {
+  invoiceLineItemIds: string[];
+}
+
+export interface RecordClaimOutcomeRequest {
+  ndiaReference?: string;
+  lineItems: ClaimLineItemOutcome[];
+}
+
+export interface ClaimLineItemOutcome {
+  lineItemId: string;
+  status: 'accepted' | 'rejected';
+  rejectionReason?: string;
+}
+
+export interface ClaimPagedResult {
+  items: Claim[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+// Budget Overview types
+export interface BudgetOverview {
+  planId: string;
+  planNumber: string;
+  totalAllocated: number;
+  totalCommitted: number;
+  totalSpent: number;
+  totalPending: number;
+  totalAvailable: number;
+  utilisationPercentage: number;
+  categories: BudgetCategoryProjection[];
+}
+
+export interface BudgetCategoryProjection {
+  categoryId: string;
+  supportCategory: string;
+  supportPurpose: string;
+  allocated: number;
+  committed: number;
+  spent: number;
+  pending: number;
+  available: number;
+  utilisationPercentage: number;
+}

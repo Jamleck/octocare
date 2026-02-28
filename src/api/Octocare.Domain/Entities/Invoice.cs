@@ -113,6 +113,12 @@ public class Invoice
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void SetSource(string source)
+    {
+        Source = source;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     public void RecalculateTotal()
     {
         TotalAmount = LineItems.Sum(li => li.Amount);

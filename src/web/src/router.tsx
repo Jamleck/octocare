@@ -21,6 +21,9 @@ import { AgreementDetailPage } from '@/pages/agreements/AgreementDetailPage';
 import { InvoicesListPage } from '@/pages/invoices/InvoicesListPage';
 import { InvoiceCreatePage } from '@/pages/invoices/InvoiceCreatePage';
 import { InvoiceDetailPage } from '@/pages/invoices/InvoiceDetailPage';
+import { ClaimsListPage } from '@/pages/claims/ClaimsListPage';
+import { ClaimCreatePage } from '@/pages/claims/ClaimCreatePage';
+import { ClaimDetailPage } from '@/pages/claims/ClaimDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +53,9 @@ export const router = createBrowserRouter([
       { path: 'invoices', element: <InvoicesListPage /> },
       { path: 'invoices/new', element: <InvoiceCreatePage /> },
       { path: 'invoices/:id', element: <InvoiceDetailPage /> },
+      { path: 'claims', element: <ClaimsListPage /> },
+      { path: 'claims/new', element: <ClaimCreatePage /> },
+      { path: 'claims/:id', element: <ClaimDetailPage /> },
       { path: 'providers', element: <ProvidersListPage /> },
       { path: 'providers/new', element: <ProviderCreatePage /> },
       { path: 'providers/:id', element: <ProviderDetailPage /> },

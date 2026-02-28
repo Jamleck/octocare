@@ -16,6 +16,7 @@ import {
   UserPlus,
   Building2,
   FileText,
+  Send,
   Settings,
   LogOut,
   ChevronRight,
@@ -26,6 +27,7 @@ const navItems = [
   { to: '/participants', label: 'Participants', icon: Users },
   { to: '/providers', label: 'Providers', icon: Building2 },
   { to: '/invoices', label: 'Invoices', icon: FileText },
+  { to: '/claims', label: 'Claims', icon: Send },
   { to: '/members', label: 'Team', icon: UserPlus },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

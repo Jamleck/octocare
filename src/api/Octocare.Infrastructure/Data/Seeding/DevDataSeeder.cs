@@ -156,7 +156,13 @@ public class DevDataSeeder
         await SeedServiceAgreementsAsync(tenantId, participant, activePlan, categories, providers);
 
         // Seed invoices for the active plan
-        await SeedInvoicesAsync(tenantId, participant, activePlan, categories, providers);
+        var invoice2LineItemIds = await SeedInvoicesAsync(tenantId, participant, activePlan, categories, providers);
+
+        // Seed claims from the approved invoice
+        await SeedClaimsAsync(tenantId, invoice2LineItemIds);
+
+        // Seed budget projections for the active plan
+        await SeedBudgetProjectionsAsync(categories);
     }
 
     private async Task SeedServiceAgreementsAsync(Guid tenantId, Participant participant,
@@ -199,7 +205,7 @@ public class DevDataSeeder
         await _db.SaveChangesAsync();
     }
 
-    private async Task SeedInvoicesAsync(Guid tenantId, Participant participant,
+    private async Task<List<Guid>> SeedInvoicesAsync(Guid tenantId, Participant participant,
         Plan activePlan, BudgetCategory[] categories, Provider[] providers)
     {
         // Invoice 1: Submitted — from Allied Health Plus
@@ -238,14 +244,13 @@ public class DevDataSeeder
         _db.Invoices.Add(invoice2);
         await _db.SaveChangesAsync();
 
-        _db.InvoiceLineItems.AddRange(
-            InvoiceLineItem.Create(invoice2.Id,
-                "04_104_0125_6_1", "Group-Based Community Activities - Week 1",
-                new DateOnly(2025, 8, 4), 12m, 9111, categories[1].Id),
-            InvoiceLineItem.Create(invoice2.Id,
-                "04_104_0125_6_1", "Group-Based Community Activities - Week 2",
-                new DateOnly(2025, 8, 11), 12m, 9111, categories[1].Id)
-        );
+        var inv2Line1 = InvoiceLineItem.Create(invoice2.Id,
+            "04_104_0125_6_1", "Group-Based Community Activities - Week 1",
+            new DateOnly(2025, 8, 4), 12m, 9111, categories[1].Id);
+        var inv2Line2 = InvoiceLineItem.Create(invoice2.Id,
+            "04_104_0125_6_1", "Group-Based Community Activities - Week 2",
+            new DateOnly(2025, 8, 11), 12m, 9111, categories[1].Id);
+        _db.InvoiceLineItems.AddRange(inv2Line1, inv2Line2);
         await _db.SaveChangesAsync();
 
         // Invoice 3: Paid — from Community Care Services
@@ -269,6 +274,61 @@ public class DevDataSeeder
                 "05_060_0115_3_1", "Assistive Equipment - Delivery & Setup",
                 new DateOnly(2025, 9, 15), 1m, 30000, categories[2].Id)
         );
+        await _db.SaveChangesAsync();
+
+        return new List<Guid> { inv2Line1.Id, inv2Line2.Id };
+    }
+
+    private async Task SeedClaimsAsync(Guid tenantId, List<Guid> approvedLineItemIds)
+    {
+        // Create a submitted claim from the approved invoice line items
+        var claim = Claim.Create(tenantId, "CLM-20250901-SEED01");
+        _db.Claims.Add(claim);
+        await _db.SaveChangesAsync();
+
+        foreach (var lineItemId in approvedLineItemIds)
+        {
+            var claimLineItem = ClaimLineItem.Create(claim.Id, lineItemId);
+            _db.ClaimLineItems.Add(claimLineItem);
+        }
+        await _db.SaveChangesAsync();
+
+        // Set the total amount and submit the claim
+        SetProperty(claim, "TotalAmount", 218664L); // matches invoice2 total
+        claim.Submit();
+        await _db.SaveChangesAsync();
+    }
+
+    private async Task SeedBudgetProjectionsAsync(BudgetCategory[] categories)
+    {
+        // Core — Daily Activities: Allocated $45,000; Committed $20,000 (active booking);
+        // Spent $0 (no approved/paid invoices for this category); Pending $1,353.26 (submitted invoice1)
+        var coreProjection = BudgetProjection.Create(categories[0].Id, categories[0].AllocatedAmount);
+        coreProjection.UpdateFromEvent(
+            allocatedCents: 4500000,
+            committedCents: 2000000,
+            spentCents: 0,
+            pendingCents: 135326);
+
+        // Capacity Building — Social & Community: Allocated $15,000; Committed $8,000 (active booking);
+        // Spent $2,186.64 (approved invoice2); Pending $0
+        var cbProjection = BudgetProjection.Create(categories[1].Id, categories[1].AllocatedAmount);
+        cbProjection.UpdateFromEvent(
+            allocatedCents: 1500000,
+            committedCents: 800000,
+            spentCents: 218664,
+            pendingCents: 0);
+
+        // Capital — Assistive Technology: Allocated $8,000; Committed $0;
+        // Spent $950 (paid invoice3); Pending $0
+        var capitalProjection = BudgetProjection.Create(categories[2].Id, categories[2].AllocatedAmount);
+        capitalProjection.UpdateFromEvent(
+            allocatedCents: 800000,
+            committedCents: 0,
+            spentCents: 95000,
+            pendingCents: 0);
+
+        _db.BudgetProjections.AddRange(coreProjection, cbProjection, capitalProjection);
         await _db.SaveChangesAsync();
     }
 
