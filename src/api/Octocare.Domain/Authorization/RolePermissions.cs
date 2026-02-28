@@ -11,20 +11,23 @@ public static class RolePermissions
             Permission.OrganisationRead, Permission.OrganisationManage,
             Permission.MembersRead, Permission.MembersManage,
             Permission.ParticipantsRead, Permission.ParticipantsWrite,
-            Permission.FinanceRead
+            Permission.FinanceRead,
+            Permission.ProvidersRead, Permission.ProvidersWrite
         ],
         [OrgRole.PlanManager] =
         [
             Permission.OrganisationRead,
             Permission.MembersRead,
-            Permission.ParticipantsRead, Permission.ParticipantsWrite
+            Permission.ParticipantsRead, Permission.ParticipantsWrite,
+            Permission.ProvidersRead, Permission.ProvidersWrite
         ],
         [OrgRole.Finance] =
         [
             Permission.OrganisationRead,
             Permission.MembersRead,
             Permission.ParticipantsRead,
-            Permission.FinanceRead, Permission.FinanceWrite
+            Permission.FinanceRead, Permission.FinanceWrite,
+            Permission.ProvidersRead
         ]
     };
 

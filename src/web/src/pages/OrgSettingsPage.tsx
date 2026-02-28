@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,10 +8,11 @@ import { useOrganisation } from '@/hooks/useOrganisation';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UpdateOrganisationRequest } from '@/types/api';
 import { ApiError } from '@/lib/api-error';
-import { Building2, Loader2, Check } from 'lucide-react';
+import { ErrorBanner } from '@/components/ErrorBanner';
+import { Building2, Loader2, Check, Mail, ChevronRight } from 'lucide-react';
 
 export function OrgSettingsPage() {
-  const { organisation, isLoading, updateOrganisation } = useOrganisation();
+  const { organisation, isLoading, error, updateOrganisation, refetch } = useOrganisation();
   const [form, setForm] = useState<UpdateOrganisationRequest>({
     name: '',
     abn: '',
@@ -57,6 +59,17 @@ export function OrgSettingsPage() {
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Organisation Settings</h1>
+        </div>
+        <ErrorBanner message={error.message} onRetry={refetch} />
       </div>
     );
   }
@@ -150,6 +163,26 @@ export function OrgSettingsPage() {
               )}
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            Email Templates
+          </CardTitle>
+          <CardDescription>
+            Manage the email templates used for notifications and automated communications.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link to="/settings/email-templates">
+            <Button variant="outline" className="gap-2">
+              Manage Email Templates
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

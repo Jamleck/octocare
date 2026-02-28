@@ -54,6 +54,16 @@ public class ParticipantRepository : IParticipantRepository
         return await query.AnyAsync(ct);
     }
 
+    public async Task<IReadOnlyList<Participant>> GetAllActiveAsync(CancellationToken ct = default)
+    {
+        await _db.SetTenantAsync(ct);
+        return await _db.Participants
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.LastName)
+            .ThenBy(p => p.FirstName)
+            .ToListAsync(ct);
+    }
+
     public async Task<Participant> AddAsync(Participant participant, CancellationToken ct = default)
     {
         _db.Participants.Add(participant);

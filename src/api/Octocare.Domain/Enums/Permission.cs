@@ -10,4 +10,6 @@ public static class Permission
     public const string ParticipantsWrite = "participants:write";
     public const string FinanceRead = "finance:read";
     public const string FinanceWrite = "finance:write";
+    public const string ProvidersRead = "providers:read";
+    public const string ProvidersWrite = "providers:write";
 }

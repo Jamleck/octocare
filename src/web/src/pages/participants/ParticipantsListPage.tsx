@@ -14,13 +14,16 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParticipants } from '@/hooks/useParticipants';
+import { useDebounce } from '@/hooks/useDebounce';
+import { ErrorBanner } from '@/components/ErrorBanner';
 import { Search, UserPlus, Users } from 'lucide-react';
 
 export function ParticipantsListPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 20;
-  const { participants, totalCount, isLoading } = useParticipants(page, pageSize, search || undefined);
+  const debouncedSearch = useDebounce(search, 300);
+  const { participants, totalCount, isLoading, error, refetch } = useParticipants(page, pageSize, debouncedSearch || undefined);
   const navigate = useNavigate();
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -34,6 +37,17 @@ export function ParticipantsListPage() {
         </div>
         <Skeleton className="h-10 w-full max-w-sm" />
         <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">Participants</h1>
+        </div>
+        <ErrorBanner message={error.message} onRetry={refetch} />
       </div>
     );
   }

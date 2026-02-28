@@ -19,6 +19,29 @@ public class OctocareDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<UserOrgMembership> UserOrgMemberships => Set<UserOrgMembership>();
     public DbSet<Participant> Participants => Set<Participant>();
+    public DbSet<StoredEvent> Events => Set<StoredEvent>();
+    public DbSet<Provider> Providers => Set<Provider>();
+    public DbSet<TenantProviderRelationship> TenantProviderRelationships => Set<TenantProviderRelationship>();
+    public DbSet<PriceGuideVersion> PriceGuideVersions => Set<PriceGuideVersion>();
+    public DbSet<SupportItem> SupportItems => Set<SupportItem>();
+    public DbSet<Plan> Plans => Set<Plan>();
+    public DbSet<BudgetCategory> BudgetCategories => Set<BudgetCategory>();
+    public DbSet<ServiceAgreement> ServiceAgreements => Set<ServiceAgreement>();
+    public DbSet<ServiceAgreementItem> ServiceAgreementItems => Set<ServiceAgreementItem>();
+    public DbSet<ServiceBooking> ServiceBookings => Set<ServiceBooking>();
+    public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();
+    public DbSet<BudgetProjection> BudgetProjections => Set<BudgetProjection>();
+    public DbSet<Claim> Claims => Set<Claim>();
+    public DbSet<ClaimLineItem> ClaimLineItems => Set<ClaimLineItem>();
+    public DbSet<PaymentBatch> PaymentBatches => Set<PaymentBatch>();
+    public DbSet<PaymentItem> PaymentItems => Set<PaymentItem>();
+    public DbSet<BudgetAlert> BudgetAlerts => Set<BudgetAlert>();
+    public DbSet<PlanTransition> PlanTransitions => Set<PlanTransition>();
+    public DbSet<ParticipantStatement> ParticipantStatements => Set<ParticipantStatement>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<CommunicationLog> CommunicationLogs => Set<CommunicationLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +57,44 @@ public class OctocareDbContext : DbContext
 
         modelBuilder.Entity<Participant>()
             .HasQueryFilter(p => _tenantContext.TenantId == null || p.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<TenantProviderRelationship>()
+            .HasQueryFilter(r => _tenantContext.TenantId == null || r.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Plan>()
+            .HasQueryFilter(p => _tenantContext.TenantId == null || p.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<ServiceAgreement>()
+            .HasQueryFilter(sa => _tenantContext.TenantId == null || sa.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Invoice>()
+            .HasQueryFilter(i => _tenantContext.TenantId == null || i.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Claim>()
+            .HasQueryFilter(c => _tenantContext.TenantId == null || c.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<PaymentBatch>()
+            .HasQueryFilter(pb => _tenantContext.TenantId == null || pb.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<BudgetAlert>()
+            .HasQueryFilter(a => _tenantContext.TenantId == null || a.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<PlanTransition>()
+            .HasQueryFilter(t => _tenantContext.TenantId == null || t.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<ParticipantStatement>()
+            .HasQueryFilter(s => _tenantContext.TenantId == null || s.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<EmailTemplate>()
+            .HasQueryFilter(e => _tenantContext.TenantId == null || e.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Notification>()
+            .HasQueryFilter(n => _tenantContext.TenantId == null || n.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<CommunicationLog>()
+            .HasQueryFilter(c => _tenantContext.TenantId == null || c.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, ClaimLineItem, or PaymentItem — they are filtered via parent relationship
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -45,10 +106,15 @@ public class OctocareDbContext : DbContext
     /// <summary>
     /// Sets the PostgreSQL session variable for RLS tenant isolation.
     /// Call this after opening a connection and before executing queries.
+    /// Skips gracefully on non-PostgreSQL providers (e.g., SQLite in tests).
     /// </summary>
-    public async Task SetTenantAsync(CancellationToken cancellationToken = default)
+    public virtual async Task SetTenantAsync(CancellationToken cancellationToken = default)
     {
         if (_tenantContext.TenantId is not { } tenantId)
+            return;
+
+        // SET session variables are PostgreSQL-specific; skip for other providers (e.g., SQLite in tests)
+        if (!Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) ?? true)
             return;
 
         var connection = Database.GetDbConnection();
@@ -92,6 +158,127 @@ public class OctocareDbContext : DbContext
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(participant.CreatedAt)).CurrentValue = now;
                 entry.Property(nameof(participant.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Provider provider)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(provider.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(provider.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is TenantProviderRelationship relationship)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(relationship.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(relationship.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PriceGuideVersion version)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(version.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(version.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is SupportItem supportItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(supportItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Plan plan)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(plan.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(plan.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetCategory budgetCategory)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(budgetCategory.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(budgetCategory.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceAgreement agreement)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(agreement.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(agreement.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceAgreementItem agreementItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(agreementItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ServiceBooking booking)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(booking.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(booking.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Invoice invoice)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(invoice.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(invoice.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is InvoiceLineItem lineItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(lineItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetProjection projection)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(projection.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(projection.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Claim claim)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(claim.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(claim.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ClaimLineItem claimLineItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(claimLineItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PaymentBatch paymentBatch)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(paymentBatch.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PaymentItem paymentItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(paymentItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetAlert budgetAlert)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(budgetAlert.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PlanTransition planTransition)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(planTransition.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ParticipantStatement statement)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(statement.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is EmailTemplate emailTemplate)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(emailTemplate.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(emailTemplate.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Notification notification)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(notification.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is CommunicationLog communicationLog)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(communicationLog.SentAt)).CurrentValue = now;
             }
         }
     }

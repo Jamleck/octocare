@@ -7,13 +7,14 @@ export function useMembers() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchMembers = useCallback(async () => {
+  const fetchMembers = useCallback(async (signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await get<Member[]>('/api/organisations/current/members');
+      const data = await get<Member[]>('/api/organisations/current/members', { signal });
       setMembers(data);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(err instanceof Error ? err : new Error('Failed to fetch members'));
     } finally {
       setIsLoading(false);
@@ -21,7 +22,9 @@ export function useMembers() {
   }, []);
 
   useEffect(() => {
-    fetchMembers();
+    const controller = new AbortController();
+    fetchMembers(controller.signal);
+    return () => controller.abort();
   }, [fetchMembers]);
 
   const inviteMember = async (request: InviteMemberRequest) => {
@@ -41,5 +44,5 @@ export function useMembers() {
     setMembers((prev) => prev.map((m) => (m.userId === userId ? { ...m, isActive: false } : m)));
   };
 
-  return { members, isLoading, error, inviteMember, updateRole, deactivateMember, refetch: fetchMembers };
+  return { members, isLoading, error, inviteMember, updateRole, deactivateMember, refetch: () => fetchMembers() };
 }
