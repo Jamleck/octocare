@@ -7,10 +7,11 @@ import { useOrganisation } from '@/hooks/useOrganisation';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UpdateOrganisationRequest } from '@/types/api';
 import { ApiError } from '@/lib/api-error';
+import { ErrorBanner } from '@/components/ErrorBanner';
 import { Building2, Loader2, Check } from 'lucide-react';
 
 export function OrgSettingsPage() {
-  const { organisation, isLoading, updateOrganisation } = useOrganisation();
+  const { organisation, isLoading, error, updateOrganisation, refetch } = useOrganisation();
   const [form, setForm] = useState<UpdateOrganisationRequest>({
     name: '',
     abn: '',
@@ -57,6 +58,17 @@ export function OrgSettingsPage() {
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Organisation Settings</h1>
+        </div>
+        <ErrorBanner message={error.message} onRetry={refetch} />
       </div>
     );
   }

@@ -8,7 +8,11 @@ export function setTokenGetter(fn: () => Promise<string>) {
   getTokenFn = fn;
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+export interface RequestOptions {
+  signal?: AbortSignal;
+}
+
+async function request<T>(method: string, path: string, body?: unknown, options?: RequestOptions): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -17,8 +21,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     try {
       const token = await getTokenFn();
       headers['Authorization'] = `Bearer ${token}`;
-    } catch {
-      // Token acquisition failed — proceed without auth header
+    } catch (err) {
+      console.warn('Token acquisition failed:', err);
     }
   }
 
@@ -26,6 +30,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    signal: options?.signal,
   });
 
   if (!response.ok) {
@@ -37,18 +42,18 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return response.json() as Promise<T>;
 }
 
-export function get<T>(path: string): Promise<T> {
-  return request<T>('GET', path);
+export function get<T>(path: string, options?: RequestOptions): Promise<T> {
+  return request<T>('GET', path, undefined, options);
 }
 
-export function post<T>(path: string, body?: unknown): Promise<T> {
-  return request<T>('POST', path, body);
+export function post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
+  return request<T>('POST', path, body, options);
 }
 
-export function put<T>(path: string, body: unknown): Promise<T> {
-  return request<T>('PUT', path, body);
+export function put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+  return request<T>('PUT', path, body, options);
 }
 
-export function del<T>(path: string): Promise<T> {
-  return request<T>('DELETE', path);
+export function del<T>(path: string, options?: RequestOptions): Promise<T> {
+  return request<T>('DELETE', path, undefined, options);
 }

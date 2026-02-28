@@ -20,6 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMembers } from '@/hooks/useMembers';
 import { InviteMemberDialog } from '@/components/InviteMemberDialog';
+import { ErrorBanner } from '@/components/ErrorBanner';
 import { UserPlus, Users, Shield, Briefcase, Calculator } from 'lucide-react';
 
 const roleLabels: Record<string, string> = {
@@ -41,7 +42,7 @@ const roleBadgeStyles: Record<string, string> = {
 };
 
 export function MembersPage() {
-  const { members, isLoading, updateRole, deactivateMember } = useMembers();
+  const { members, isLoading, error, updateRole, deactivateMember, refetch } = useMembers();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   if (isLoading) {
@@ -52,6 +53,17 @@ export function MembersPage() {
           <Skeleton className="h-9 w-36" />
         </div>
         <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">Team Members</h1>
+        </div>
+        <ErrorBanner message={error.message} onRetry={refetch} />
       </div>
     );
   }

@@ -45,10 +45,15 @@ public class OctocareDbContext : DbContext
     /// <summary>
     /// Sets the PostgreSQL session variable for RLS tenant isolation.
     /// Call this after opening a connection and before executing queries.
+    /// Skips gracefully on non-PostgreSQL providers (e.g., SQLite in tests).
     /// </summary>
-    public async Task SetTenantAsync(CancellationToken cancellationToken = default)
+    public virtual async Task SetTenantAsync(CancellationToken cancellationToken = default)
     {
         if (_tenantContext.TenantId is not { } tenantId)
+            return;
+
+        // SET session variables are PostgreSQL-specific; skip for other providers (e.g., SQLite in tests)
+        if (!Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) ?? true)
             return;
 
         var connection = Database.GetDbConnection();
