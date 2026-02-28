@@ -111,10 +111,46 @@ public class DevDataSeeder
         }
         await _db.SaveChangesAsync();
 
+        // Seed plans and budget categories for the first participant
+        await SeedPlansAsync(org.Id, participants[0]);
+
         // Seed price guide version and support items (shared reference data)
         await SeedPriceGuideAsync();
 
         _logger.LogInformation("Development data seeded successfully");
+    }
+
+    private async Task SeedPlansAsync(Guid tenantId, Participant participant)
+    {
+        // Active plan with budget categories
+        var activePlan = Plan.Create(tenantId, participant.Id, "NDIS-2025-001",
+            new DateOnly(2025, 7, 1), new DateOnly(2026, 6, 30));
+        // Activate the plan via reflection since we want it in Active state
+        activePlan.Activate();
+
+        _db.Plans.Add(activePlan);
+        await _db.SaveChangesAsync();
+
+        // Add budget categories for the active plan
+        var categories = new[]
+        {
+            BudgetCategory.Create(activePlan.Id, SupportCategory.Core,
+                SupportPurpose.DailyActivities, 4500000), // $45,000.00
+            BudgetCategory.Create(activePlan.Id, SupportCategory.CapacityBuilding,
+                SupportPurpose.IncreasedSocialAndCommunityParticipation, 1500000), // $15,000.00
+            BudgetCategory.Create(activePlan.Id, SupportCategory.Capital,
+                SupportPurpose.AssistiveTechnology, 800000), // $8,000.00
+        };
+
+        _db.BudgetCategories.AddRange(categories);
+        await _db.SaveChangesAsync();
+
+        // Draft plan (no budget categories yet)
+        var draftPlan = Plan.Create(tenantId, participant.Id, "NDIS-2026-001",
+            new DateOnly(2026, 7, 1), new DateOnly(2027, 6, 30));
+
+        _db.Plans.Add(draftPlan);
+        await _db.SaveChangesAsync();
     }
 
     private async Task SeedPriceGuideAsync()

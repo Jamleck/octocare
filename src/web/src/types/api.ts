@@ -135,6 +135,45 @@ export interface SupportItem {
   claimType: string;
 }
 
+export type PlanStatus = 'draft' | 'active' | 'expiring' | 'expired' | 'transitioned';
+
+export interface Plan {
+  id: string;
+  participantId: string;
+  participantName: string;
+  planNumber: string;
+  startDate: string;
+  endDate: string;
+  status: PlanStatus;
+  budgetCategories: BudgetCategory[];
+  createdAt: string;
+}
+
+export interface BudgetCategory {
+  id: string;
+  supportCategory: SupportCategory;
+  supportPurpose: string;
+  allocatedAmount: number;
+}
+
+export interface CreatePlanRequest {
+  planNumber: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface UpdatePlanRequest {
+  planNumber: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface CreateBudgetCategoryRequest {
+  supportCategory: SupportCategory;
+  supportPurpose: string;
+  allocatedAmount: number;
+}
+
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;

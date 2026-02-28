@@ -24,6 +24,8 @@ public class OctocareDbContext : DbContext
     public DbSet<TenantProviderRelationship> TenantProviderRelationships => Set<TenantProviderRelationship>();
     public DbSet<PriceGuideVersion> PriceGuideVersions => Set<PriceGuideVersion>();
     public DbSet<SupportItem> SupportItems => Set<SupportItem>();
+    public DbSet<Plan> Plans => Set<Plan>();
+    public DbSet<BudgetCategory> BudgetCategories => Set<BudgetCategory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,7 +45,10 @@ public class OctocareDbContext : DbContext
         modelBuilder.Entity<TenantProviderRelationship>()
             .HasQueryFilter(r => _tenantContext.TenantId == null || r.TenantId == _tenantContext.TenantId);
 
-        // No query filter on Provider or StoredEvent — they are shared across tenants
+        modelBuilder.Entity<Plan>()
+            .HasQueryFilter(p => _tenantContext.TenantId == null || p.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, or BudgetCategory (filtered via Plan relationship) — they are shared across tenants
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -130,6 +135,18 @@ public class OctocareDbContext : DbContext
             {
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(supportItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is Plan plan)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(plan.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(plan.UpdatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetCategory budgetCategory)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(budgetCategory.CreatedAt)).CurrentValue = now;
+                entry.Property(nameof(budgetCategory.UpdatedAt)).CurrentValue = now;
             }
         }
     }

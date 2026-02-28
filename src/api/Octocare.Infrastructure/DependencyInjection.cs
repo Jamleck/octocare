@@ -33,6 +33,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IEventStore, EventStoreRepository>();
         builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
         builder.Services.AddScoped<IPriceGuideRepository, PriceGuideRepository>();
+        builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 
         // Seeding
         builder.Services.AddScoped<DevDataSeeder>();
