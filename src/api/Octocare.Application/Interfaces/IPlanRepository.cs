@@ -13,4 +13,5 @@ public interface IPlanRepository
     Task UpdateAsync(Plan plan, CancellationToken ct = default);
     Task SaveAsync(CancellationToken ct = default);
     Task AddBudgetCategoryAsync(BudgetCategory category, CancellationToken ct = default);
+    Task<IReadOnlyList<Plan>> GetActivePlansAsync(CancellationToken ct = default);
 }

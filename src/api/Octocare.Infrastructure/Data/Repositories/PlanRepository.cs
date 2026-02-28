@@ -82,4 +82,14 @@ public class PlanRepository : IPlanRepository
         _db.BudgetCategories.Add(category);
         await _db.SaveChangesAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Plan>> GetActivePlansAsync(CancellationToken ct = default)
+    {
+        await _db.SetTenantAsync(ct);
+        return await _db.Plans
+            .Include(p => p.Participant)
+            .Include(p => p.BudgetCategories)
+            .Where(p => p.Status == PlanStatus.Active || p.Status == PlanStatus.Expiring)
+            .ToListAsync(ct);
+    }
 }

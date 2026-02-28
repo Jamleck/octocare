@@ -12,6 +12,9 @@ public class Provider
     public string? ContactEmail { get; private set; }
     public string? ContactPhone { get; private set; }
     public string? Address { get; private set; }
+    public string? Bsb { get; private set; }
+    public string? AccountNumber { get; private set; }
+    public string? AccountName { get; private set; }
     public bool IsActive { get; private set; } = true;
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -41,6 +44,14 @@ public class Provider
         ContactEmail = contactEmail;
         ContactPhone = contactPhone;
         Address = address;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateBankDetails(string? bsb, string? accountNumber, string? accountName)
+    {
+        Bsb = bsb;
+        AccountNumber = accountNumber;
+        AccountName = accountName;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 

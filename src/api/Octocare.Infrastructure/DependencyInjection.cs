@@ -6,6 +6,7 @@ using Octocare.Application.Interfaces;
 using Octocare.Infrastructure.Data;
 using Octocare.Infrastructure.Data.Repositories;
 using Octocare.Infrastructure.Data.Seeding;
+using Octocare.Infrastructure.External;
 using Octocare.Infrastructure.Tenancy;
 
 namespace Octocare.Infrastructure;
@@ -38,6 +39,12 @@ public static class DependencyInjection
         builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         builder.Services.AddScoped<IBudgetProjectionRepository, BudgetProjectionRepository>();
         builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
+        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+        builder.Services.AddScoped<IAlertRepository, AlertRepository>();
+        builder.Services.AddScoped<IPlanTransitionRepository, PlanTransitionRepository>();
+
+        // External integrations (mock for MVP)
+        builder.Services.AddScoped<IProdaPaceClient, MockProdaPaceClient>();
 
         // Seeding
         builder.Services.AddScoped<DevDataSeeder>();

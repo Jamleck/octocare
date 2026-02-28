@@ -34,6 +34,10 @@ public class OctocareDbContext : DbContext
     public DbSet<BudgetProjection> BudgetProjections => Set<BudgetProjection>();
     public DbSet<Claim> Claims => Set<Claim>();
     public DbSet<ClaimLineItem> ClaimLineItems => Set<ClaimLineItem>();
+    public DbSet<PaymentBatch> PaymentBatches => Set<PaymentBatch>();
+    public DbSet<PaymentItem> PaymentItems => Set<PaymentItem>();
+    public DbSet<BudgetAlert> BudgetAlerts => Set<BudgetAlert>();
+    public DbSet<PlanTransition> PlanTransitions => Set<PlanTransition>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,7 +69,16 @@ public class OctocareDbContext : DbContext
         modelBuilder.Entity<Claim>()
             .HasQueryFilter(c => _tenantContext.TenantId == null || c.TenantId == _tenantContext.TenantId);
 
-        // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, or ClaimLineItem — they are filtered via parent relationship
+        modelBuilder.Entity<PaymentBatch>()
+            .HasQueryFilter(pb => _tenantContext.TenantId == null || pb.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<BudgetAlert>()
+            .HasQueryFilter(a => _tenantContext.TenantId == null || a.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<PlanTransition>()
+            .HasQueryFilter(t => _tenantContext.TenantId == null || t.TenantId == _tenantContext.TenantId);
+
+        // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, ClaimLineItem, or PaymentItem — they are filtered via parent relationship
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -209,6 +222,26 @@ public class OctocareDbContext : DbContext
             {
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(claimLineItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PaymentBatch paymentBatch)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(paymentBatch.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PaymentItem paymentItem)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(paymentItem.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is BudgetAlert budgetAlert)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(budgetAlert.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is PlanTransition planTransition)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(planTransition.CreatedAt)).CurrentValue = now;
             }
         }
     }

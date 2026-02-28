@@ -24,6 +24,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePlan, activatePlan, addBudgetCategory } from '@/hooks/usePlans';
 import { ErrorBanner } from '@/components/ErrorBanner';
 import { BudgetOverviewCard } from '@/components/BudgetOverviewCard';
+import { AlertsPanel } from '@/components/AlertsPanel';
+import { PlanTransitionDialog } from '@/components/PlanTransitionDialog';
 import {
   ArrowLeft,
   Pencil,
@@ -213,6 +215,13 @@ export function PlanDetailPage() {
                 </Button>
               </>
             )}
+            {(plan.status === 'active' || plan.status === 'expiring' || plan.status === 'expired') && (
+              <PlanTransitionDialog
+                planId={plan.id}
+                planNumber={plan.planNumber}
+                planStatus={plan.status}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -320,6 +329,11 @@ export function PlanDetailPage() {
       {/* Budget Overview — shown for active/expiring plans with budget categories */}
       {!isDraft && plan.budgetCategories.length > 0 && (
         <BudgetOverviewCard planId={plan.id} />
+      )}
+
+      {/* Budget Alerts — shown for non-draft plans */}
+      {!isDraft && (
+        <AlertsPanel planId={plan.id} />
       )}
 
       {/* Add Budget Category Dialog */}

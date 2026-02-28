@@ -20,6 +20,11 @@ public static class DependencyInjection
         services.AddScoped<PmFeeService>();
         services.AddScoped<ClaimService>();
         services.AddScoped<NdiaCsvExporter>();
+        services.AddScoped<PaymentService>();
+        services.AddScoped<AbaFileGenerator>();
+        services.AddScoped<AlertService>();
+        services.AddScoped<PlanTransitionService>();
+        services.AddScoped<ProdaSyncService>();
 
         return services;
     }

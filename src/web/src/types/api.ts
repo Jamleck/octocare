@@ -386,3 +386,145 @@ export interface BudgetCategoryProjection {
   available: number;
   utilisationPercentage: number;
 }
+
+// Payment Batch types
+export type PaymentBatchStatus = 'draft' | 'generated' | 'sent' | 'confirmed';
+
+export interface PaymentBatch {
+  id: string;
+  batchNumber: string;
+  status: PaymentBatchStatus;
+  totalAmount: number;
+  itemCount: number;
+  abaFileUrl?: string;
+  createdAt: string;
+  sentAt?: string;
+  confirmedAt?: string;
+}
+
+export interface PaymentItem {
+  id: string;
+  providerId: string;
+  providerName: string;
+  amount: number;
+  invoiceCount: number;
+  invoiceIds: string;
+}
+
+export interface PaymentBatchDetail extends PaymentBatch {
+  items: PaymentItem[];
+}
+
+export interface PaymentBatchPagedResult {
+  items: PaymentBatch[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+// Budget Alert types
+export type AlertType =
+  | 'BudgetThreshold75'
+  | 'BudgetThreshold90'
+  | 'ProjectedOverspend'
+  | 'ProjectedUnderspend'
+  | 'PlanExpiry90Days'
+  | 'PlanExpiry60Days'
+  | 'PlanExpiry30Days'
+  | 'ServiceGap';
+
+export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
+
+export interface BudgetAlert {
+  id: string;
+  planId: string;
+  budgetCategoryId?: string;
+  alertType: AlertType;
+  severity: AlertSeverity;
+  message: string;
+  isRead: boolean;
+  isDismissed: boolean;
+  createdAt: string;
+  readAt?: string;
+  data?: string;
+}
+
+export interface AlertSummary {
+  total: number;
+  unreadInfo: number;
+  unreadWarning: number;
+  unreadCritical: number;
+}
+
+// Plan Transition types
+export type PlanTransitionStatus = 'Pending' | 'InProgress' | 'Completed';
+
+export interface TransitionChecklistItem {
+  label: string;
+  completed: boolean;
+}
+
+export interface PlanTransition {
+  id: string;
+  oldPlanId: string;
+  oldPlanNumber: string;
+  newPlanId?: string;
+  newPlanNumber?: string;
+  status: PlanTransitionStatus;
+  checklistItems: TransitionChecklistItem[];
+  notes?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface InitiateTransitionRequest {
+  oldPlanId: string;
+}
+
+export interface UpdateTransitionRequest {
+  checklistItems: TransitionChecklistItem[];
+  notes?: string;
+}
+
+// PRODA/PACE Integration types
+export interface ProdaPlanInfo {
+  planNumber: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  totalBudget: number;
+}
+
+export interface ProdaParticipantInfo {
+  ndisNumber: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface ProdaBudgetInfo {
+  planNumber: string;
+  categories: ProdaBudgetLine[];
+}
+
+export interface ProdaBudgetLine {
+  category: string;
+  purpose: string;
+  allocated: number;
+  used: number;
+  available: number;
+}
+
+export interface SyncResult {
+  inSync: boolean;
+  discrepancies: SyncDiscrepancy[];
+}
+
+export interface SyncDiscrepancy {
+  field: string;
+  localValue: string;
+  prodaValue: string;
+  severity: string;
+}

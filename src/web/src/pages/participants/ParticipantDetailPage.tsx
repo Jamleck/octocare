@@ -39,6 +39,7 @@ import {
   ClipboardList,
   Building2,
 } from 'lucide-react';
+import { ProdaSyncPanel } from '@/components/ProdaSyncPanel';
 import type { PlanStatus, ServiceAgreementStatus } from '@/types/api';
 
 export function ParticipantDetailPage() {
@@ -323,6 +324,9 @@ export function ParticipantDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* PRODA Sync Section */}
+      <ProdaSyncPanel participantId={participant.id} />
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>

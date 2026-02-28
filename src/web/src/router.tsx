@@ -24,6 +24,8 @@ import { InvoiceDetailPage } from '@/pages/invoices/InvoiceDetailPage';
 import { ClaimsListPage } from '@/pages/claims/ClaimsListPage';
 import { ClaimCreatePage } from '@/pages/claims/ClaimCreatePage';
 import { ClaimDetailPage } from '@/pages/claims/ClaimDetailPage';
+import { PaymentsListPage } from '@/pages/payments/PaymentsListPage';
+import { PaymentDetailPage } from '@/pages/payments/PaymentDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +62,8 @@ export const router = createBrowserRouter([
       { path: 'providers/new', element: <ProviderCreatePage /> },
       { path: 'providers/:id', element: <ProviderDetailPage /> },
       { path: 'providers/:id/edit', element: <ProviderEditPage /> },
+      { path: 'payments', element: <PaymentsListPage /> },
+      { path: 'payments/:id', element: <PaymentDetailPage /> },
     ],
   },
 ]);
