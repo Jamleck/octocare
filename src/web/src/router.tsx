@@ -26,6 +26,7 @@ import { ClaimCreatePage } from '@/pages/claims/ClaimCreatePage';
 import { ClaimDetailPage } from '@/pages/claims/ClaimDetailPage';
 import { PaymentsListPage } from '@/pages/payments/PaymentsListPage';
 import { PaymentDetailPage } from '@/pages/payments/PaymentDetailPage';
+import { ReportsPage } from '@/pages/reports/ReportsPage';
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +65,7 @@ export const router = createBrowserRouter([
       { path: 'providers/:id/edit', element: <ProviderEditPage /> },
       { path: 'payments', element: <PaymentsListPage /> },
       { path: 'payments/:id', element: <PaymentDetailPage /> },
+      { path: 'reports', element: <ReportsPage /> },
     ],
   },
 ]);

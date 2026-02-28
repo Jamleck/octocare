@@ -18,6 +18,7 @@ import {
   FileText,
   Send,
   Banknote,
+  BarChart3,
   Settings,
   LogOut,
   ChevronRight,
@@ -30,6 +31,7 @@ const navItems = [
   { to: '/invoices', label: 'Invoices', icon: FileText },
   { to: '/claims', label: 'Claims', icon: Send },
   { to: '/payments', label: 'Payments', icon: Banknote },
+  { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/members', label: 'Team', icon: UserPlus },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

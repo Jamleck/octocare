@@ -38,6 +38,7 @@ public class OctocareDbContext : DbContext
     public DbSet<PaymentItem> PaymentItems => Set<PaymentItem>();
     public DbSet<BudgetAlert> BudgetAlerts => Set<BudgetAlert>();
     public DbSet<PlanTransition> PlanTransitions => Set<PlanTransition>();
+    public DbSet<ParticipantStatement> ParticipantStatements => Set<ParticipantStatement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,6 +78,9 @@ public class OctocareDbContext : DbContext
 
         modelBuilder.Entity<PlanTransition>()
             .HasQueryFilter(t => _tenantContext.TenantId == null || t.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<ParticipantStatement>()
+            .HasQueryFilter(s => _tenantContext.TenantId == null || s.TenantId == _tenantContext.TenantId);
 
         // No query filter on Provider, StoredEvent, BudgetCategory, BudgetProjection, ServiceAgreementItem, ServiceBooking, InvoiceLineItem, ClaimLineItem, or PaymentItem — they are filtered via parent relationship
     }
@@ -242,6 +246,11 @@ public class OctocareDbContext : DbContext
             {
                 if (entry.State == EntityState.Added)
                     entry.Property(nameof(planTransition.CreatedAt)).CurrentValue = now;
+            }
+            else if (entry.Entity is ParticipantStatement statement)
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Property(nameof(statement.CreatedAt)).CurrentValue = now;
             }
         }
     }

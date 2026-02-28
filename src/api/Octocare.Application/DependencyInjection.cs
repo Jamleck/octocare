@@ -25,6 +25,11 @@ public static class DependencyInjection
         services.AddScoped<AlertService>();
         services.AddScoped<PlanTransitionService>();
         services.AddScoped<ProdaSyncService>();
+        services.AddScoped<ReportService>();
+        services.AddScoped<CsvExportService>();
+        services.AddScoped<ExcelExportService>();
+        services.AddScoped<StatementPdfGenerator>();
+        services.AddScoped<StatementService>();
 
         return services;
     }

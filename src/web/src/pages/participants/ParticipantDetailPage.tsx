@@ -40,6 +40,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { ProdaSyncPanel } from '@/components/ProdaSyncPanel';
+import { StatementsPanel } from '@/components/StatementsPanel';
 import type { PlanStatus, ServiceAgreementStatus } from '@/types/api';
 
 export function ParticipantDetailPage() {
@@ -324,6 +325,9 @@ export function ParticipantDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Statements Section */}
+      <StatementsPanel participantId={participant.id} plans={plans} />
 
       {/* PRODA Sync Section */}
       <ProdaSyncPanel participantId={participant.id} />

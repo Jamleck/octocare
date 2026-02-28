@@ -528,3 +528,73 @@ export interface SyncDiscrepancy {
   prodaValue: string;
   severity: string;
 }
+
+// Report types
+export interface BudgetUtilisationReportRow {
+  participantName: string;
+  ndisNumber: string;
+  planNumber: string;
+  category: string;
+  purpose: string;
+  allocated: number;
+  spent: number;
+  available: number;
+  utilisationPercent: number;
+}
+
+export interface OutstandingInvoiceRow {
+  invoiceNumber: string;
+  providerName: string;
+  participantName: string;
+  servicePeriodEnd: string;
+  amount: number;
+  status: string;
+  daysOutstanding: number;
+  ageBucket: string;
+}
+
+export interface ClaimStatusRow {
+  batchNumber: string;
+  status: string;
+  totalAmount: number;
+  lineItemCount: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  submissionDate?: string;
+}
+
+export interface ParticipantSummaryRow {
+  name: string;
+  ndisNumber: string;
+  isActive: boolean;
+  activePlanNumber?: string;
+  planEnd?: string;
+  totalAllocated: number;
+  totalSpent: number;
+  utilisationPercent: number;
+}
+
+export interface AuditTrailRow {
+  timestamp: string;
+  streamType: string;
+  eventType: string;
+  streamId: string;
+  details: string;
+}
+
+// Participant Statement types
+export interface ParticipantStatement {
+  id: string;
+  participantId: string;
+  planId: string;
+  periodStart: string;
+  periodEnd: string;
+  generatedAt: string;
+  sentAt?: string;
+}
+
+export interface GenerateStatementRequest {
+  planId: string;
+  periodStart: string;
+  periodEnd: string;
+}

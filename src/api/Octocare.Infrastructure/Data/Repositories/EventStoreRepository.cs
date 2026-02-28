@@ -58,4 +58,26 @@ public class EventStoreRepository : IEventStore
 
         return events;
     }
+
+    public async Task<IReadOnlyList<StoredEventDto>> GetByDateRangeAsync(DateTime from, DateTime to, string? streamType = null, CancellationToken ct = default)
+    {
+        var fromOffset = new DateTimeOffset(from, TimeSpan.Zero);
+        var toOffset = new DateTimeOffset(to, TimeSpan.Zero);
+
+        var query = _db.Events
+            .Where(e => e.CreatedAt >= fromOffset && e.CreatedAt <= toOffset);
+
+        if (!string.IsNullOrWhiteSpace(streamType))
+            query = query.Where(e => e.StreamType == streamType);
+
+        var events = await query
+            .OrderByDescending(e => e.CreatedAt)
+            .Select(e => new StoredEventDto(
+                e.Id, e.StreamId, e.StreamType, e.EventType,
+                e.Payload, e.Metadata, e.Version, e.CreatedAt.UtcDateTime))
+            .Take(1000)
+            .ToListAsync(ct);
+
+        return events;
+    }
 }
